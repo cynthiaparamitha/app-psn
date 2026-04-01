@@ -46,6 +46,21 @@ RUN docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
 # Copy Composer
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
+# 3. Salin file composer dulu untuk memanfaatkan cache layer
+COPY composer.json composer.lock ./
+
+# 4. Jalankan Composer Install (tanpa script dulu agar tidak error jika class belum ada)
+RUN composer install --no-scripts --no-autoloader --no-interaction
+
+# 5. Salin seluruh kode aplikasi
+COPY . .
+
+# 6. Jalankan dump-autoload dan optimasi
+RUN composer dump-autoload --optimize
+
+# 7. Set Permission untuk Laravel
+RUN chown -R www-data:www-data /var/www/storage /var/www/bootstrap/cache
+
 # Bersihkan cache untuk mengurangi ukuran image
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
