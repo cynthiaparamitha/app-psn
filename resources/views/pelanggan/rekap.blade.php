@@ -55,7 +55,7 @@ td {
     padding: 8px 10px;
     border-bottom: 1px solid #eee;
     font-size: 14px;
-    word-wrap: break-word;     /* Teks panjang dibungkus */
+    word-wrap: break-word;     
     white-space: normal;
 }
 
@@ -86,6 +86,11 @@ tr:nth-child(even) {
     text-align: center;
     padding: 10px;
 }
+
+.total-row {
+    font-weight: bold;
+    background: #f0f0f0;
+}
 </style>
 </head>
 <body>
@@ -108,6 +113,10 @@ tr:nth-child(even) {
                 <td>{{ $jumlah }}</td>
             </tr>
         @endforeach
+        <tr class="total-row">
+            <td>Total</td>
+            <td>{{ $rekapTarif->sum() }}</td>
+        </tr>
     </table>
 </div>
 
@@ -124,6 +133,10 @@ tr:nth-child(even) {
                 <td>{{ $jumlah }}</td>
             </tr>
         @endforeach
+        <tr class="total-row">
+            <td>Total</td>
+            <td>{{ $rekapCabang->sum() }}</td>
+        </tr>
     </table>
 </div>
 
@@ -140,6 +153,10 @@ tr:nth-child(even) {
                 <td>{{ $jumlah }}</td>
             </tr>
         @endforeach
+        <tr class="total-row">
+            <td>Total</td>
+            <td>{{ $rekapZona->sum() }}</td>
+        </tr>
     </table>
 </div>
 
@@ -156,6 +173,10 @@ tr:nth-child(even) {
                 <td>{{ $jumlah }}</td>
             </tr>
         @endforeach
+        <tr class="total-row">
+            <td>Total</td>
+            <td>{{ $rekapStatus->sum() }}</td>
+        </tr>
     </table>
 </div>
 

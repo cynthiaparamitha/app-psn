@@ -142,11 +142,21 @@
     <select name="tarif">
         <option value="">-- Tarif --</option>
         @foreach($tarifList as $t)
+            @php $tTrim = trim($t); @endphp
+            <option value="{{ $tTrim }}" {{ ($tarif ?? '') == $tTrim ? 'selected' : '' }}>
+                {{ $tTrim }}
+            </option>
+        @endforeach
+    </select>
+    
+    <!-- <select name="tarif">
+        <option value="">-- Tarif --</option>
+        @foreach($tarifList as $t)
             <option value="{{ $t }}" {{ ($tarif ?? '') == $t ? 'selected' : '' }}>
                 {{ $t }}
             </option>
         @endforeach
-    </select>
+    </select> -->
 
     <select name="cabang">
         <option value="">-- Cabang --</option>
