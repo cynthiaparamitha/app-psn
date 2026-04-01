@@ -4,8 +4,7 @@ nixPkgs = [
   "php82Extensions.pdo_sqlsrv",
   "php82Extensions.sqlsrv",
   "php82Packages.composer",
-  "nodejs_22",
-  "npm"
+  "nodejs_22"
 ]
 
 [phases.install]
