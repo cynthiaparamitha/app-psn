@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <title>Login DRD</title>
+    <title>Login</title>
 
     <style>
         body {
