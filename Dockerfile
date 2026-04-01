@@ -1,4 +1,4 @@
-FROM php:8.3-fpm
+FROM php:8.2-fpm
 
 # Set environment agar installer tidak meminta input interaktif
 ENV DEBIAN_FRONTEND=noninteractive
@@ -36,8 +36,8 @@ RUN apt-get update && ACCEPT_EULA=Y apt-get install -y \
 # 4. Install Ekstensi PHP dengan penanganan error manual
 # Terkadang PECL butuh update channel sebelum install
 RUN pecl channel-update pecl.php.net \
-    && pecl install sqlsrv-5.11.0 \
-    && pecl install pdo_sqlsrv-5.11.0 \
+    && pecl install sqlsrv-5.12.0 \
+    && pecl install pdo_sqlsrv-5.12.0 \
     && docker-php-ext-enable sqlsrv pdo_sqlsrv
 
 # 5. Install ekstensi standar Laravel
