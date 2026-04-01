@@ -12,7 +12,6 @@ class DrdController extends Controller
         $tabul = $request->tabul;
         $zona  = $request->zona;
 
-        // --- Ambil list tabul PS Mutasi 6 ---
         $listTabul = DB::table('TR_DRD as d')
             ->join('tr_mutasi as m', 'd.Nopel', '=', 'm.Nopel')
             ->whereIn('m.plg_cd', function ($q) {
@@ -26,12 +25,10 @@ class DrdController extends Controller
             ->orderBy('d.tabul', 'desc')
             ->get();
 
-        // --- Perbaikan utama: default tabul harus dari listTabul ---
         if (!$tabul) {
             $tabul = $listTabul->first()->tabul ?? null;
         }
 
-        // Jika tetap null → jelas tidak ada data
         if (!$tabul) {
             return view('drd.index_zona', [
                 'data'      => [],
@@ -40,7 +37,6 @@ class DrdController extends Controller
             ]);
         }
 
-        // --- Jika belum pilih zona: tampilkan per zona ---
         if (!$zona) {
             $data = DB::select("
                 select
@@ -71,7 +67,6 @@ class DrdController extends Controller
             return view('drd.index_zona', compact('data', 'listTabul', 'tabul'));
         }
 
-        // --- Jika zona dipilih: tampilkan per cabang ---
         $data = DB::select("
             select
                 c.cabang_nm as cabang,
