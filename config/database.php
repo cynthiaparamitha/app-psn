@@ -112,6 +112,7 @@ return [
             'encrypt' => env('DB_ENCRYPT', 'yes'),
             'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'false'),
             'options' => [
+                PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
                 PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
                 'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
                 'Encrypt' => env('DB_ENCRYPT', 'yes'),
