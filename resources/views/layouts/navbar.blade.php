@@ -8,11 +8,13 @@
         <li><a href="{{ route('drd.index') }}" class="{{ request()->is('drd') ? 'active' : '' }}">DRD</a></li>
         <li><a href="{{ route('mutasi.index') }}" class="{{ request()->is('mutasi') ? 'active' : '' }}">Mutasi</a></li>
         <li><a href="{{ route('pelanggan.index') }}" class="{{ request()->is('pelanggan') ? 'active' : '' }}">Pelanggan</a></li>
+
+        {{-- Tombol Logout --}}
+        <li><a href="{{ route('logout') }}" class="logout-btn">Logout</a></li>
     </ul>
 </nav>
 
 <style>
-
 .navbar {
     background: #2c3e50;
     padding: 12px 20px;
@@ -41,6 +43,16 @@
     font-size: 16px;
     padding-bottom: 3px;
     transition: 0.2s;
+}
+
+/* Style tombol Logout */
+.logout-btn {
+    color: #ff7675 !important;
+    font-weight: bold;
+}
+
+.logout-btn:hover {
+    border-bottom: 2px solid #ff7675;
 }
 
 .nav-menu a:hover {

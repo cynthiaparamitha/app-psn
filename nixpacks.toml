@@ -20,3 +20,18 @@ cmds = [
 
 [start]
 cmd = "php artisan serve --host=0.0.0.0 --port=${PORT}"
+
+[variables]
+# Example: If your server root is in public/
+# NIXPACKS_PHP_ROOT_DIR = '/app/public'
+
+[build]
+# Install Microsoft ODBC driver and required libraries
+packages = [
+    "unixODBC",
+    "msodbcsql18" # Or msodbcsql17 based on requirements
+]
+
+[php]
+# Install SQL Server extensions for PHP
+extensions = ["pdo_sqlsrv", "sqlsrv"]

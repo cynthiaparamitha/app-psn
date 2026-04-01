@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class DrdController extends Controller
 {
+    public function __construct()
+    {
+        // Cek apakah sudah login
+        if (!session()->has('user')) {
+            redirect('/login')->send();
+            exit;
+        }
+    }
+
     public function index(Request $request)
     {
         $tabul = $request->tabul;

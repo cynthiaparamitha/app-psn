@@ -106,10 +106,12 @@
 <h2>Laporan DRD PSN Zona {{ $zona ?? '' }}</h2>
 
 <div class="filter-box">
-    <form method="GET">
-        <label><b>Periode:</b></label>
+<form method="GET">
+    <input type="hidden" name="zona" value="{{ $zona }}">
 
-        <select name="tabul" onchange="this.form.submit()">
+    <label><b>Periode:</b></label>
+
+    <select name="tabul" onchange="this.form.submit()">
 
             @php
                 $bulanSingkat = [

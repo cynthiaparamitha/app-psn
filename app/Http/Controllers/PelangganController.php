@@ -7,6 +7,15 @@ use Illuminate\Support\Facades\DB;
 
 class PelangganController extends Controller
 {
+    public function __construct()
+    {
+        // Cek login
+        if (!session()->has('user')) {
+            redirect('/login')->send();
+            exit;
+        }
+    }
+
     public function index(Request $request)
     {
         $search = $request->search;

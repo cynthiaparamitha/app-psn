@@ -7,6 +7,15 @@ use Illuminate\Http\Request;
 
 class MutasiController extends Controller
 {
+    public function __construct()
+    {
+        // Cek login (session)
+        if (!session()->has('user')) {
+            redirect('/login')->send();
+            exit;
+        }
+    }
+
     public function index(Request $request)
     {
         $tabul = $request->tabul;
