@@ -7,7 +7,7 @@
 body {
     font-family: Arial, sans-serif;
     background: #f0f2f5;
-    margin: 25px;
+    margin: 20px;
 }
 
 h2 {

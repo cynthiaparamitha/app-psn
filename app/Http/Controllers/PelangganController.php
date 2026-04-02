@@ -9,7 +9,6 @@ class PelangganController extends Controller
 {
     public function __construct()
     {
-        // Cek login
         if (!session()->has('user')) {
             redirect('/login')->send();
             exit;
@@ -24,13 +23,10 @@ class PelangganController extends Controller
         $status = $request->status;
         $zona   = $request->zona;
 
+        $allowedSort = ['nopel', 'nama'];
+
         $sort  = $request->sort ?? 'nopel';
         $order = $request->order ?? 'asc';
-
-        $allowedSort = [
-            'nopel','nama','alamat','kode_tarif',
-            'no_meter','cabang','zona','status'
-        ];
 
         if (!in_array($sort, $allowedSort)) {
             $sort = 'nopel';
@@ -49,28 +45,16 @@ class PelangganController extends Controller
             });
 
         $tarifList = (clone $basePSN)
-            ->select('t.tarif_cd')
-            ->distinct()
-            ->orderBy('t.tarif_cd')
-            ->pluck('tarif_cd');
+            ->select('t.tarif_cd')->distinct()->orderBy('t.tarif_cd')->pluck('tarif_cd');
 
         $cabangList = (clone $basePSN)
-            ->select('c.cabang_nm')
-            ->distinct()
-            ->orderBy('c.cabang_nm')
-            ->pluck('cabang_nm');
+            ->select('c.cabang_nm')->distinct()->orderBy('c.cabang_nm')->pluck('cabang_nm');
 
         $zonaList = (clone $basePSN)
-            ->select('c.zona_cd')
-            ->distinct()
-            ->orderBy('c.zona_cd')
-            ->pluck('zona_cd');
+            ->select('c.zona_cd')->distinct()->orderBy('c.zona_cd')->pluck('zona_cd');
 
         $statusList = (clone $basePSN)
-            ->select('p.status')
-            ->distinct()
-            ->orderBy('p.status')
-            ->pluck('status');
+            ->select('p.status')->distinct()->orderBy('p.status')->pluck('status');
 
         $query = (clone $basePSN)
             ->select(
@@ -96,12 +80,18 @@ class PelangganController extends Controller
         if ($status) $query->where('p.status', $status);
         if ($zona)   $query->where('c.zona_cd', $zona);
 
-        $data = $query->orderBy($sort, $order)->get();
+        if (in_array($sort, ['nopel', 'nama'])) {
+            $query->orderBy(DB::raw("LOWER($sort)"), $order);
+        } else {
+            $query->orderBy($sort, $order);
+        }
+
+        $data = $query->get();
 
         return view('pelanggan.index', compact(
-            'data','search','tarif','cabang','status','zona',
-            'sort','order','nextOrder',
-            'tarifList','cabangList','statusList','zonaList'
+            'data', 'search', 'tarif', 'cabang', 'status', 'zona',
+            'sort', 'order', 'nextOrder',
+            'tarifList', 'cabangList', 'statusList', 'zonaList'
         ));
     }
 
@@ -136,7 +126,7 @@ class PelangganController extends Controller
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('p.nopel', 'like', "%$search%")
-                ->orWhere('p.nama', 'like', "%$search%");
+                  ->orWhere('p.nama', 'like', "%$search%");
             });
         }
 

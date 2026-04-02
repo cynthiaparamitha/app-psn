@@ -29,8 +29,8 @@
     select, input[type=text] {
         padding: 6px 10px;
         margin-right: 8px;
-        border: 1px solid #ccc;
         border-radius: 4px;
+        border: 1px solid #ccc;
     }
 
     button {
@@ -61,8 +61,6 @@
         padding: 10px;
         font-weight: bold;
         border: 1px solid #ddd;
-        cursor: pointer;
-        user-select: none;
     }
 
     table th a {
@@ -86,41 +84,38 @@
     .sort-icon {
         margin-left: 4px;
         font-size: 12px;
-        opacity: 0.8;
+        opacity: .8;
     }
 
     .rekap-btn {
-    padding: 8px 16px;
-    background: #27ae60;
-    color: white;
-    border-radius: 4px;
-    text-decoration: none;
-    margin-left: 10px;
-    font-weight: bold;
-    display: inline-block;
+        padding: 8px 14px;
+        background: #27ae60;
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+        margin-left: 10px;
     }
+
     .rekap-btn:hover {
         background: #239b56;
     }
 
     .reset-text {
-        display: inline-block;
-        margin-bottom: 8px;
-        margin-right: 8px;
-        color: #adadad;
-        font-weight: bold;
+        margin-right: 10px;
+        color: #888;
+        font-size: 14px;
         cursor: pointer;
         text-decoration: none;
-        font-size: 14px;
+        font-weight: bold;
     }
 
     .reset-text:hover {
         text-decoration: underline;
     }
-
 </style>
-
 </head>
+
 <body>
 
 @include('layouts.navbar')
@@ -130,13 +125,9 @@
 <div class="filter-box">
 <form method="GET">
 
-    <a href="{{ route('pelanggan.index') }}" class="reset-text">
-        ⟳ Reset
-    </a>
+    <a href="{{ route('pelanggan.index') }}" class="reset-text">⟳ Reset</a>
 
-    <input type="text" 
-           name="search" 
-           placeholder="Cari nopel / nama"
+    <input type="text" name="search" placeholder="Cari nopel / nama"
            value="{{ $search ?? '' }}">
 
     <select name="tarif">
@@ -148,15 +139,6 @@
             </option>
         @endforeach
     </select>
-    
-    <!-- <select name="tarif">
-        <option value="">-- Tarif --</option>
-        @foreach($tarifList as $t)
-            <option value="{{ $t }}" {{ ($tarif ?? '') == $t ? 'selected' : '' }}>
-                {{ $t }}
-            </option>
-        @endforeach
-    </select> -->
 
     <select name="cabang">
         <option value="">-- Cabang --</option>
@@ -186,35 +168,65 @@
     </select>
 
     <button type="submit">Filter</button>
-    
+
     <a href="{{ route('pelanggan.rekap', request()->query()) }}" class="rekap-btn">
-        📊 Rekapan
+        📊 Rekap
     </a>
 
 </form>
 </div>
 
 @php
-    function sortUrl($col, $nextOrder) {
-        return "?sort=$col&order=$nextOrder&" . http_build_query(request()->except('sort','order'));
-    }
+    $sortCol   = $sort ?? '';
+    $sortOrder = $order ?? 'asc';
 
-    function sortIcon($col, $sort, $order) {
-        if ($col !== $sort) return '';
-        return $order === 'asc' ? '▲' : '▼';
+    $nextAsc  = 'asc';
+    $nextDesc = 'desc';
+
+    $columns = ['nopel', 'nama'];
+
+    $sortUrls = [];
+    $sortIcons = [];
+
+    foreach ($columns as $col) {
+
+        $nextOrder = ($sortCol === $col && $sortOrder === 'asc') ? 'desc' : 'asc';
+
+        $query = array_merge(request()->query(), [
+            'sort'  => $col,
+            'order' => $nextOrder,
+        ]);
+
+        $sortUrls[$col] = url()->current() . '?' . http_build_query($query);
+
+        if ($sortCol === $col) {
+            $sortIcons[$col] = $sortOrder === 'asc' ? '▲' : '▼';
+        } else {
+            $sortIcons[$col] = '';
+        }
     }
 @endphp
 
 <table>
 <tr>
-    <th><a href="{{ sortUrl('nopel', $nextOrder) }}">No Pel <span class="sort-icon">{{ sortIcon('nopel', $sort, $order) }}</span></a></th>
-    <th><a href="{{ sortUrl('nama', $nextOrder) }}">Nama <span class="sort-icon">{{ sortIcon('nama', $sort, $order) }}</span></a></th>
-    <th><a href="{{ sortUrl('alamat', $nextOrder) }}">Alamat <span class="sort-icon">{{ sortIcon('alamat', $sort, $order) }}</span></a></th>
-    <th><a href="{{ sortUrl('kode_tarif', $nextOrder) }}">Tarif <span class="sort-icon">{{ sortIcon('kode_tarif', $sort, $order) }}</span></a></th>
-    <th><a href="{{ sortUrl('no_meter', $nextOrder) }}">No Meter <span class="sort-icon">{{ sortIcon('no_meter', $sort, $order) }}</span></a></th>
-    <th><a href="{{ sortUrl('cabang', $nextOrder) }}">Cabang <span class="sort-icon">{{ sortIcon('cabang', $sort, $order) }}</span></a></th>
-    <th><a href="{{ sortUrl('zona', $nextOrder) }}">Zona <span class="sort-icon">{{ sortIcon('zona', $sort, $order) }}</span></a></th>
-    <th><a href="{{ sortUrl('status', $nextOrder) }}">Status <span class="sort-icon">{{ sortIcon('status', $sort, $order) }}</span></a></th>
+    <th>
+    <a href="{{ $sortUrls['nopel'] }}">
+        No Pel <span class="sort-icon">{{ $sortIcons['nopel'] }}</span>
+    </a>
+    </th>
+
+    <th>
+        <a href="{{ $sortUrls['nama'] }}">
+            Nama <span class="sort-icon">{{ $sortIcons['nama'] }}</span>
+        </a>
+    </th>
+
+    <th>Alamat</th>
+    <th>Tarif</th>
+    <th>No Meter</th>
+    <th>Cabang</th>
+    <th>Zona</th>
+    <th>Status</th>
 </tr>
 
 @foreach($data as $row)
@@ -229,7 +241,6 @@
     <td>{{ $row->status }}</td>
 </tr>
 @endforeach
-
 </table>
 
 </body>

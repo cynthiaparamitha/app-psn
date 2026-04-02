@@ -8,8 +8,8 @@
         <li><a href="{{ route('drd.index') }}" class="{{ request()->is('drd') ? 'active' : '' }}">DRD</a></li>
         <li><a href="{{ route('mutasi.index') }}" class="{{ request()->is('mutasi') ? 'active' : '' }}">Mutasi</a></li>
         <li><a href="{{ route('pelanggan.index') }}" class="{{ request()->is('pelanggan') ? 'active' : '' }}">Pelanggan</a></li>
+        <li><a href="{{ route('monitoring.tarif') }}" class="{{ request()->is('monitoring-tarif') ? 'active' : '' }}">Monitor</a></li>
 
-        {{-- Tombol Logout --}}
         <li><a href="{{ route('logout') }}" class="logout-btn">Logout</a></li>
     </ul>
 </nav>
