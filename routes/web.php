@@ -4,7 +4,8 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DrdController;
 use App\Http\Controllers\MutasiController;
 use App\Http\Controllers\PelangganController;
-use App\Http\Controllers\MonitorController;   // ← Tambahkan ini
+use App\Http\Controllers\MonitorController;
+use App\Http\Controllers\TagihanController;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
@@ -24,3 +25,5 @@ Route::get('/pelanggan', [PelangganController::class, 'index'])->name('pelanggan
 Route::get('/pelanggan/rekap', [PelangganController::class, 'rekap'])->name('pelanggan.rekap');
 
 Route::get('/monitoring-tarif', [MonitorController::class, 'tarif'])->name('monitoring.tarif');
+
+Route::get('/tagihan', [TagihanController::class, 'index'])->name('tagihan.index');

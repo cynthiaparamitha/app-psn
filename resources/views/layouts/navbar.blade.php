@@ -9,7 +9,7 @@
         <li><a href="{{ route('mutasi.index') }}" class="{{ request()->is('mutasi') ? 'active' : '' }}">Mutasi</a></li>
         <li><a href="{{ route('pelanggan.index') }}" class="{{ request()->is('pelanggan') ? 'active' : '' }}">Pelanggan</a></li>
         <li><a href="{{ route('monitoring.tarif') }}" class="{{ request()->is('monitoring-tarif') ? 'active' : '' }}">Monitor</a></li>
-
+        <li><a href="{{ route('tagihan.index') }}" class="{{ request()->is('tagihan') ? 'active' : '' }}">Tagihan</a></li>
         <li><a href="{{ route('logout') }}" class="logout-btn">Logout</a></li>
     </ul>
 </nav>
