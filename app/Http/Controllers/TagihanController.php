@@ -14,8 +14,9 @@ class TagihanController extends Controller
         $cabang      = $request->cabang;
         $status      = $request->status;
         $tunggakan   = $request->tunggakan;
+        $perPage     = $request->perPage ?? 10;
 
-        $data = DB::select("
+        $rawData = DB::select("
             WITH CTE_DRD_TOTAL AS (
                 SELECT 
                     plg_cd, 
@@ -84,7 +85,7 @@ class TagihanController extends Controller
             )
         ");
 
-        $data = collect($data);
+        $data = collect($rawData);
 
         if ($search) {
             $data = $data->filter(function ($row) use ($search) {
@@ -93,17 +94,9 @@ class TagihanController extends Controller
             });
         }
 
-        if ($zona) {
-            $data = $data->where('zona', $zona);
-        }
-
-        if ($cabang) {
-            $data = $data->where('cabang', $cabang);
-        }
-
-        if ($status) {
-            $data = $data->where('status', $status);
-        }
+        if ($zona)   $data = $data->where('zona', $zona);
+        if ($cabang) $data = $data->where('cabang', $cabang);
+        if ($status) $data = $data->where('status', $status);
 
         if ($tunggakan == "1") {
             $data = $data->filter(fn($row) => $row->jumlah_bulan_menunggak > 0);
@@ -115,9 +108,26 @@ class TagihanController extends Controller
         $cabangList = $data->pluck('cabang')->unique()->sort()->values();
         $statusList = $data->pluck('status')->unique()->sort()->values();
 
+        if ($perPage !== 'all') {
+
+            $currentPage = request()->input('page', 1);
+            $offset      = ($currentPage - 1) * $perPage;
+
+            $pagedData = $data->slice($offset, $perPage)->values();
+
+            $data = new \Illuminate\Pagination\LengthAwarePaginator(
+                $pagedData,
+                $data->count(),
+                $perPage,
+                $currentPage,
+                ['path' => url()->current(), 'query' => request()->query()]
+            );
+
+        }
+
         return view('tagihan.index', compact(
             'data', 'search', 'zona', 'cabang', 'status', 'tunggakan',
-            'zonaList', 'cabangList', 'statusList'
+            'zonaList', 'cabangList', 'statusList', 'perPage'
         ));
     }
 }

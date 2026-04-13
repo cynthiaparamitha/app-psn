@@ -23,8 +23,14 @@ class PelangganController extends Controller
         $status = $request->status;
         $zona   = $request->zona;
 
-        $allowedSort = ['nopel', 'nama'];
+        $perPage = $request->perPage ?? 10;
+        $allowedPerPage = [10, 25, 50, 100, 'all'];
 
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
+
+        $allowedSort = ['nopel', 'nama'];
         $sort  = $request->sort ?? 'nopel';
         $order = $request->order ?? 'asc';
 
@@ -44,17 +50,10 @@ class PelangganController extends Controller
                     ->where('tarif_cd', 'PS');
             });
 
-        $tarifList = (clone $basePSN)
-            ->select('t.tarif_cd')->distinct()->orderBy('t.tarif_cd')->pluck('tarif_cd');
-
-        $cabangList = (clone $basePSN)
-            ->select('c.cabang_nm')->distinct()->orderBy('c.cabang_nm')->pluck('cabang_nm');
-
-        $zonaList = (clone $basePSN)
-            ->select('c.zona_cd')->distinct()->orderBy('c.zona_cd')->pluck('zona_cd');
-
-        $statusList = (clone $basePSN)
-            ->select('p.status')->distinct()->orderBy('p.status')->pluck('status');
+        $tarifList  = (clone $basePSN)->select('t.tarif_cd')->distinct()->pluck('tarif_cd');
+        $cabangList = (clone $basePSN)->select('c.cabang_nm')->distinct()->pluck('c.cabang_nm');
+        $zonaList   = (clone $basePSN)->select('c.zona_cd')->distinct()->pluck('c.zona_cd');
+        $statusList = (clone $basePSN)->select('p.status')->distinct()->pluck('status');
 
         $query = (clone $basePSN)
             ->select(
@@ -80,18 +79,19 @@ class PelangganController extends Controller
         if ($status) $query->where('p.status', $status);
         if ($zona)   $query->where('c.zona_cd', $zona);
 
-        if (in_array($sort, ['nopel', 'nama'])) {
-            $query->orderBy(DB::raw("LOWER($sort)"), $order);
-        } else {
-            $query->orderBy($sort, $order);
-        }
+        $query->orderBy(DB::raw("LOWER($sort)"), $order);
 
-        $data = $query->get();
+        if ($perPage === 'all') {
+            $data = $query->get();
+        } else {
+            $data = $query->paginate($perPage)->withQueryString();
+        }
 
         return view('pelanggan.index', compact(
             'data', 'search', 'tarif', 'cabang', 'status', 'zona',
             'sort', 'order', 'nextOrder',
-            'tarifList', 'cabangList', 'statusList', 'zonaList'
+            'tarifList', 'cabangList', 'statusList', 'zonaList',
+            'perPage'
         ));
     }
 
@@ -137,14 +137,12 @@ class PelangganController extends Controller
 
         $data = $query->get();
 
-        $rekapTarif  = $data->groupBy('kode_tarif')->map->count();
-        $rekapCabang = $data->groupBy('cabang')->map->count();
-        $rekapZona   = $data->groupBy('zona')->map->count();
-        $rekapStatus = $data->groupBy('status')->map->count();
-        $total       = $data->count();
-
-        return view('pelanggan.rekap', compact(
-            'rekapTarif','rekapCabang','rekapZona','rekapStatus','total'
-        ));
+        return view('pelanggan.rekap', [
+            'rekapTarif'  => $data->groupBy('kode_tarif')->map->count(),
+            'rekapCabang' => $data->groupBy('cabang')->map->count(),
+            'rekapZona'   => $data->groupBy('zona')->map->count(),
+            'rekapStatus' => $data->groupBy('status')->map->count(),
+            'total'       => $data->count(),
+        ]);
     }
 }

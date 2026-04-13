@@ -94,6 +94,35 @@
 
     .num { text-align: right; }
     .center { text-align: center; }
+
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding-left: 0;
+        margin-top: 20px;
+    }
+
+    .pagination li {
+        margin-right: 8px;
+    }
+
+    .pagination li a,
+    .pagination li span {
+        padding: 6px 12px;
+        background: #3498db;
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .pagination li.disabled span {
+        background: #bdc3c7;
+    }
+
+    .pagination li a:hover {
+        background: #2980b9;
+    }
 </style>
 </head>
 
@@ -145,6 +174,14 @@
         </option>
     </select>
 
+    <select name="perPage">
+        <option value="10"  {{ ($perPage ?? 10) == 10 ? 'selected' : '' }}>10</option>
+        <option value="25"  {{ ($perPage ?? 10) == 25 ? 'selected' : '' }}>25</option>
+        <option value="50"  {{ ($perPage ?? 10) == 50 ? 'selected' : '' }}>50</option>
+        <option value="100" {{ ($perPage ?? 10) == 100 ? 'selected' : '' }}>100</option>
+        <option value="all" {{ ($perPage ?? 10) == 'all' ? 'selected' : '' }}>All</option>
+    </select>
+
     <button type="submit">Filter</button>
 
 </form>
@@ -193,6 +230,27 @@
     </tr>
     @endforeach
 </table>
+
+@if($perPage === 'all')
+<div style="margin-top: 20px; font-size: 14px; color: #555;">
+    Showing all {{ count($data) }} data
+</div>
+@endif
+
+@if($perPage !== 'all')
+<div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+
+    <div style="font-size: 14px; color: #555;">
+        Showing {{ $data->firstItem() }} - {{ $data->lastItem() }} 
+        of {{ $data->total() }} data
+    </div>
+
+    <div>
+        {{ $data->onEachSide(0)->links('pagination::simple-default') }}
+    </div>
+
+</div>
+@endif
 
 </body>
 </html>

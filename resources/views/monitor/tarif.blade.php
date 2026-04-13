@@ -78,6 +78,34 @@
     .warning {
         background: #ffdddd !important;
     }
+    .pagination {
+        display: flex;
+        list-style: none;
+        padding-left: 0;
+        margin-top: 20px;
+    }
+
+    .pagination li {
+        margin-right: 8px;
+    }
+
+    .pagination li a,
+    .pagination li span {
+        padding: 6px 12px;
+        background: #3498db;
+        color: white;
+        border-radius: 4px;
+        text-decoration: none;
+        font-weight: bold;
+    }
+
+    .pagination li.disabled span {
+        background: #bdc3c7;
+    }
+
+    .pagination li a:hover {
+        background: #2980b9;
+    }
 </style>
 </head>
 
@@ -101,8 +129,20 @@
         </select>
 
         <select name="sort" onchange="this.form.submit()">
-            <option value="desc" {{ request('sort')=='desc' ? 'selected' : '' }}>Bulan Terbanyak</option>
-            <option value="asc" {{ request('sort')=='asc' ? 'selected' : '' }}>Bulan Tersedikit</option>
+            <option value="bulan" {{ request('sort')=='bulan' ? 'selected' : '' }}>Sort by Bulan</option>
+        </select>
+
+        <select name="order" onchange="this.form.submit()">
+            <option value="desc" {{ request('order')=='desc' ? 'selected' : '' }}>Bulan Terbanyak</option>
+            <option value="asc"  {{ request('order')=='asc'  ? 'selected' : '' }}>Bulan Tersedikit</option>
+        </select>
+
+        <select name="perPage" onchange="this.form.submit()">
+            <option value="10"  {{ request('perPage')==10 ? 'selected' : '' }}>10</option>
+            <option value="25"  {{ request('perPage')==25 ? 'selected' : '' }}>25</option>
+            <option value="50"  {{ request('perPage')==50 ? 'selected' : '' }}>50</option>
+            <option value="100" {{ request('perPage')==100 ? 'selected' : '' }}>100</option>
+            <option value="all" {{ request('perPage')=='all' ? 'selected' : '' }}>All</option>
         </select>
 
         <a href="{{ url()->current() }}" class="btn-reset">⟳ Reset</a>
@@ -140,6 +180,27 @@
 
     </tbody>
 </table>
+
+@if(request('perPage') !== 'all' && method_exists($data, 'links'))
+    <div style="margin-top: 20px; display: flex; justify-content: space-between; align-items: center;">
+
+        <div style="font-size: 14px; color: #555;">
+            Showing {{ $data->firstItem() }} - {{ $data->lastItem() }}
+            of {{ $data->total() }} data
+        </div>
+
+        <div>
+            {{ $data->onEachSide(0)->links('pagination::simple-default') }}
+        </div>
+
+    </div>
+@endif
+
+@if(request('perPage') === 'all')
+    <div style="margin-top: 20px; font-size: 14px; color: #555;">
+        Showing all {{ count($data) }} data
+    </div>
+@endif
 
 </body>
 </html>

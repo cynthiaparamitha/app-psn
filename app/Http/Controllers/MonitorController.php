@@ -10,7 +10,15 @@ class MonitorController extends Controller
     public function tarif(Request $request)
     {
         $bulan = $request->bulan;
-        $order = $request->sort ?? 'desc'; // default: paling banyak
+        $sort  = $request->sort ?? 'bulan';
+        $order = $request->order ?? 'desc';
+
+        $perPage         = $request->perPage ?? 10;
+        $allowedPerPage  = [10, 25, 50, 100, 'all'];
+
+        if (!in_array($perPage, $allowedPerPage)) {
+            $perPage = 10;
+        }
 
         $query = DB::table('TR_DRD as d')
             ->join('FT_Plg as p', 'p.Plg_CD', '=', 'd.Plg_CD')
@@ -33,8 +41,18 @@ class MonitorController extends Controller
             }
         }
 
-        $data = $query->orderBy('bulan', $order)->get();
+        $query->orderBy($sort, $order);
 
-        return view('monitor.tarif', compact('data', 'bulan', 'order'));
+        if ($perPage === 'all') {
+            $data = $query->get();
+        } else {
+            $data = $query->paginate($perPage)->withQueryString();
+        }
+
+        $nextOrder = ($order === 'asc') ? 'desc' : 'asc';
+
+        return view('monitor.tarif', compact(
+            'data', 'bulan', 'sort', 'order', 'nextOrder', 'perPage'
+        ));
     }
 }
