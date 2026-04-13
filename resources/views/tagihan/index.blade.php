@@ -130,6 +130,17 @@
 
 @include('layouts.navbar')
 
+@php
+    $total_bulan_drd       = $data->sum('jumlah_bulan_drd');
+    $total_nominal_drd     = $data->sum('nominal_drd');
+
+    $total_bulan_bayar     = $data->sum('jumlah_bulan_bayar');
+    $total_nominal_bayar   = $data->sum('nominal_ar');
+
+    $total_bulan_tunggakan = $data->sum('jumlah_bulan_menunggak');
+    $total_nominal_tunggak = $data->sum('nominal_tunggakan');
+@endphp
+
 <h2>Tagihan PSN</h2>
 
 <div class="filter-box">
@@ -229,6 +240,19 @@
         <td class="num">{{ number_format($d->nominal_tunggakan, 0, ',', '.') }}</td>
     </tr>
     @endforeach
+
+    <tr style="background:#e8f2ff; font-weight:bold;">
+    <td colspan="6" class="num">TOTAL :</td>
+
+    <td class="center">{{ $total_bulan_drd }}</td>
+    <td class="num">{{ number_format($total_nominal_drd, 0, ',', '.') }}</td>
+
+    <td class="center">{{ $total_bulan_bayar }}</td>
+    <td class="num">{{ number_format($total_nominal_bayar, 0, ',', '.') }}</td>
+
+    <td class="center">{{ $total_bulan_tunggakan }}</td>
+    <td class="num">{{ number_format($total_nominal_tunggak, 0, ',', '.') }}</td>
+</tr>
 </table>
 
 @if($perPage === 'all')
