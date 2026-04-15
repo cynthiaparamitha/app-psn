@@ -21,17 +21,29 @@ class MonitorController extends Controller
         }
 
         $query = DB::table('TR_DRD as d')
-            ->join('FT_Plg as p', 'p.Plg_CD', '=', 'd.Plg_CD')
-            ->select(
-                'd.Plg_CD',
-                'p.Nopel',
-                'p.Nama',
-                'p.Tarif_CD as Tarif',
-                DB::raw('COUNT(*) as bulan')
-            )
-            ->where('d.Tarif_CD', 'PS')
-            ->where('p.Tarif_CD', 'PS')
-            ->groupBy('d.Plg_CD', 'p.Nopel', 'p.Nama', 'p.Tarif_CD');
+        ->join('FT_Plg as p', 'p.Plg_CD', '=', 'd.Plg_CD')
+        ->join('TR_Mutasi as m', function ($join) {
+            $join->on('m.Plg_CD', '=', 'p.Plg_CD')
+                ->where('m.Mutasi_CD', '=', '6');
+        })
+        ->select(
+            'd.Plg_CD',
+            'p.Nopel',
+            'p.Nama',
+            'p.Tarif_CD as Tarif',
+            DB::raw('COUNT(*) as bulan')
+        )
+        ->where('d.Tarif_CD', 'PS')
+        ->where('p.Tarif_CD', 'PS')
+        ->whereNotIn('m.Plg_CD', function($sub){
+            $sub->select('plg_cd')
+                ->from('tr_mutasi')
+                ->where('mutasi_cd', '8')
+                ->where('asalnya', 'like', '%PSN%')
+                ->where('nama', 'not like', '%PSN%')
+                ->whereRaw("not nopel = '010303008157'");
+        })
+        ->groupBy('d.Plg_CD', 'p.Nopel', 'p.Nama', 'p.Tarif_CD');
 
         if (!empty($bulan)) {
             if ($bulan == 6) {

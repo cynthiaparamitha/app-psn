@@ -161,7 +161,7 @@
     </select>
 
     <select name="cabang">
-        <option value="">-- Cabang --</option>
+        <option value="">-- K. Pelayanan --</option>
         @foreach($cabangList as $c)
             <option value="{{ $c }}" {{ ($cabang ?? '') == $c ? 'selected' : '' }}>
                 {{ $c }}
@@ -204,7 +204,7 @@
         <th rowspan="2">Nama</th>
         <th rowspan="2">Alamat</th>
         <th rowspan="2">Status</th>
-        <th rowspan="2">Cabang</th>
+        <th rowspan="2">K. Pelayanan</th>
         <th rowspan="2">Zona</th>
 
         <th colspan="2">DRD</th>
@@ -241,17 +241,17 @@
     </tr>
     @endforeach
 
-    <tr style="background:#e8f2ff; font-weight:bold;">
+<tr style="background:#e8f2ff; font-weight:bold;">
     <td colspan="6" class="num">TOTAL :</td>
 
-    <td class="center">{{ $total_bulan_drd }}</td>
-    <td class="num">{{ number_format($total_nominal_drd, 0, ',', '.') }}</td>
+    <td class="center">{{ $totals['bulan_drd'] }}</td>
+    <td class="num">{{ number_format($totals['nominal_drd'], 0, ',', '.') }}</td>
 
-    <td class="center">{{ $total_bulan_bayar }}</td>
-    <td class="num">{{ number_format($total_nominal_bayar, 0, ',', '.') }}</td>
+    <td class="center">{{ $totals['bulan_bayar'] }}</td>
+    <td class="num">{{ number_format($totals['nominal_bayar'], 0, ',', '.') }}</td>
 
-    <td class="center">{{ $total_bulan_tunggakan }}</td>
-    <td class="num">{{ number_format($total_nominal_tunggak, 0, ',', '.') }}</td>
+    <td class="center">{{ $totals['bulan_tunggakan'] }}</td>
+    <td class="num">{{ number_format($totals['nominal_tunggak'], 0, ',', '.') }}</td>
 </tr>
 </table>
 
@@ -269,9 +269,11 @@
         of {{ $data->total() }} data
     </div>
 
-    <div>
-        {{ $data->onEachSide(0)->links('pagination::simple-default') }}
-    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+
+    {{ $data->onEachSide(0)->links('pagination::simple-default') }}
+
+</div>
 
 </div>
 @endif

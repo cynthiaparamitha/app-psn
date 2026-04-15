@@ -140,7 +140,7 @@
 
 <table>
 <tr>
-    <th>Cabang</th>
+    <th>K. Pelayanan</th>
     <th>Jumlah</th>
     <th>Kubik</th>
     <th>Nominal Air</th>

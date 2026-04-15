@@ -48,35 +48,43 @@ class DrdController extends Controller
 
         if (!$zona) {
             $data = DB::select("
-                select
-                    c.zona_cd as zona,
-                    COUNT(distinct d.nopel) AS jumlah,
-                    SUM(d.Kubikasi) AS kubikasi,
-                    SUM(d.nominal) as nominal,
-                    SUM(d.administrasi) as administrasi,
-                    SUM(d.koreksi) as koreksi,
-                    SUM(d.total) as total
-                from TR_DRD d
-                left join tr_mutasi m on d.nopel = m.nopel
-                left join ft_cabang c on d.cabang_cd = c.cabang_cd
-                where
-                    m.plg_cd in (
-                        select plg_cd
-                        from tr_mutasi
-                        where mutasi_cd = '6'
-                        and tarif_cd = 'PS'
-                    )
-                    AND d.tabul = ?
-                group by
-                    c.zona_cd
-                order by
-                    c.zona_cd
-            ", [$tabul]);
+            select
+                c.zona_cd as zona,
+                COUNT(distinct d.plg_cd) AS jumlah,
+                SUM(d.Kubikasi) AS kubikasi,
+                SUM(d.nominal) as nominal,
+                SUM(d.administrasi) as administrasi,
+                SUM(d.koreksi) as koreksi,
+                SUM(d.total) as total
+            from TR_DRD d
+            inner join tr_mutasi m on d.plg_cd = m.plg_cd and m.Mutasi_CD='6'
+            left join ft_cabang c on d.cabang_cd = c.cabang_cd
+            where
+                m.plg_cd in (
+                    select plg_cd
+                    from tr_mutasi
+                    where mutasi_cd = '6'
+                    and tarif_cd = 'PS'
+                )
+                AND m.plg_cd not in (
+                    select plg_cd 
+                    from tr_mutasi 
+                    where mutasi_cd = '8' 
+                    and asalnya like '%PSN%' 
+                    and nama not like '%PSN%' 
+                    and not nopel = '010303008157'
+                )
+                AND d.tabul = ?
+            group by
+                c.zona_cd
+            order by
+                c.zona_cd
+        ", [$tabul]);
 
             return view('drd.index_zona', compact('data', 'listTabul', 'tabul'));
         }
 
-        $data = DB::select("
+            $data = DB::select("
             select
                 c.cabang_nm as cabang,
                 COUNT(distinct d.nopel) AS jumlah,
@@ -86,7 +94,7 @@ class DrdController extends Controller
                 SUM(d.koreksi) as koreksi,
                 SUM(d.total) as total
             from TR_DRD d
-            left join tr_mutasi m on d.nopel = m.nopel
+            inner join tr_mutasi m on d.plg_cd = m.plg_cd and m.Mutasi_CD='6'
             left join ft_cabang c on d.cabang_cd = c.cabang_cd
             where
                 m.plg_cd in (
@@ -94,6 +102,14 @@ class DrdController extends Controller
                     from tr_mutasi
                     where mutasi_cd = '6'
                     and tarif_cd = 'PS'
+                )
+                AND m.plg_cd not in (
+                    select plg_cd 
+                    from tr_mutasi 
+                    where mutasi_cd = '8' 
+                    and asalnya like '%PSN%' 
+                    and nama not like '%PSN%' 
+                    and not nopel = '010303008157'
                 )
                 AND d.tabul = ?
                 AND c.zona_cd = ?

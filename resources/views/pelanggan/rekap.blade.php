@@ -121,10 +121,10 @@ tr:nth-child(even) {
 </div>
 
 <div class="card">
-    <div class="section-title">Rekap Berdasarkan Cabang</div>
+    <div class="section-title">Rekap Berdasarkan Kantor Pelayanan</div>
     <table>
         <tr>
-            <th>Cabang</th>
+            <th>Kantor Pelayanan</th>
             <th>Jumlah Pelanggan</th>
         </tr>
         @foreach($rekapCabang as $cabang => $jumlah)

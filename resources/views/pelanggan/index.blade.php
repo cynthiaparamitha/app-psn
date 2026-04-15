@@ -114,7 +114,6 @@
         text-decoration: underline;
     }
 
-    /* PAGINATION SIMPLE (PREVIOUS / NEXT) */
     .pagination {
         display: flex;
         list-style: none;
@@ -171,7 +170,7 @@
     </select>
 
     <select name="cabang">
-        <option value="">-- Cabang --</option>
+        <option value="">-- K. Pelayanan --</option>
         @foreach($cabangList as $c)
             <option value="{{ $c }}" {{ ($cabang ?? '') == $c ? 'selected' : '' }}>
                 {{ $c }}

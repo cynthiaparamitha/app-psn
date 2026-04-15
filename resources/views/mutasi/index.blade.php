@@ -127,7 +127,7 @@
 
 <table>
 <tr>
-    <th>Cabang</th>
+    <th>K. Pelayanan</th>
     <th>Golongan</th>
     <th>Alamat Plg</th>
     <th>Ganti Meter</th>

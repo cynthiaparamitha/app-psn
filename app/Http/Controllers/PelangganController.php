@@ -48,6 +48,14 @@ class PelangganController extends Controller
                     ->from('tr_mutasi')
                     ->where('mutasi_cd', '6')
                     ->where('tarif_cd', 'PS');
+            })
+            ->whereNotIn('p.plg_cd', function ($sub2) {
+                $sub2->select('plg_cd')
+                    ->from('tr_mutasi')
+                    ->where('mutasi_cd', '8')
+                    ->where('asalnya', 'like', '%PSN%')
+                    ->where('nama', 'not like', '%PSN%')
+                    ->where('nopel', '!=', '010303008157');
             });
 
         $tarifList  = (clone $basePSN)->select('t.tarif_cd')->distinct()->pluck('tarif_cd');
@@ -111,6 +119,14 @@ class PelangganController extends Controller
                     ->from('tr_mutasi')
                     ->where('mutasi_cd', '6')
                     ->where('tarif_cd', 'PS');
+            })
+            ->whereNotIn('p.plg_cd', function ($sub2) {
+                $sub2->select('plg_cd')
+                    ->from('tr_mutasi')
+                    ->where('mutasi_cd', '8')
+                    ->where('asalnya', 'like', '%PSN%')
+                    ->where('nama', 'not like', '%PSN%')
+                    ->where('nopel', '!=', '010303008157');
             })
             ->select(
                 'p.nopel',
