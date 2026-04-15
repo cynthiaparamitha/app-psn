@@ -110,11 +110,70 @@ class TagihanController extends Controller
         if ($cabang) $data = $data->where('cabang', $cabang);
         if ($status) $data = $data->where('status', $status);
 
-        if ($tunggakan == "1") {
+        if ($tunggakan === "1") {
             $data = $data->filter(fn($row) => $row->jumlah_bulan_menunggak > 0);
         }
 
-        $data = $data->sortBy('nopel')->values();
+        if ($tunggakan === "0") {
+            $data = $data->filter(fn($row) => $row->jumlah_bulan_menunggak == 0);
+        }
+
+        $sort = $request->sort ?? 'default';
+
+        switch ($sort) {
+
+            case 'nopel_asc':
+                $data = $data->sortBy('nopel');
+            break;
+
+            case 'nopel_desc':
+                $data = $data->sortByDesc('nopel');
+            break;
+
+            case 'drd_asc':
+                $data = $data
+                    ->sortBy('nopel')
+                    ->sortBy('jumlah_bulan_drd');
+            break;
+
+            case 'drd_desc':
+                $data = $data
+                    ->sortBy('nopel')
+                    ->sortByDesc('jumlah_bulan_drd');
+            break;
+
+            case 'bayar_asc':
+                $data = $data
+                    ->sortBy('nopel')
+                    ->sortBy('jumlah_bulan_bayar');
+            break;
+
+            case 'bayar_desc':
+                $data = $data
+                    ->sortBy('nopel')
+                    ->sortByDesc('jumlah_bulan_bayar');
+            break;
+
+            case 'tunggak_asc':
+                $data = $data
+                    ->sortBy('nopel')
+                    ->sortBy('jumlah_bulan_menunggak');
+            break;
+
+            case 'tunggak_desc':
+                $data = $data
+                    ->sortBy('nopel')
+                    ->sortByDesc('jumlah_bulan_menunggak');
+            break;
+
+            default:
+                $data = $data
+                    ->sortBy('nopel')
+                    ->sortByDesc('jumlah_bulan_drd');
+            break;
+        }
+
+        $data = $data->values();
 
         $zonaList   = $data->pluck('zona')->unique()->sort()->values();
         $cabangList = $data->pluck('cabang')->unique()->sort()->values();
@@ -147,7 +206,7 @@ class TagihanController extends Controller
         return view('tagihan.index', compact(
             'data', 'search', 'zona', 'cabang', 'status', 'tunggakan',
             'zonaList', 'cabangList', 'statusList', 'perPage',
-            'totals'
+            'totals', 'sort'
         ));
     }
 }

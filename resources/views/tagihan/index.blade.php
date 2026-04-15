@@ -180,8 +180,13 @@
 
     <select name="tunggakan">
         <option value="">-- Tunggakan --</option>
+
         <option value="1" {{ ($tunggakan ?? '') == '1' ? 'selected' : '' }}>
             Ada Tunggakan
+        </option>
+
+        <option value="0" {{ ($tunggakan ?? '') == '0' ? 'selected' : '' }}>
+            Tidak Ada Tunggakan
         </option>
     </select>
 
@@ -198,9 +203,49 @@
 </form>
 </div>
 
+<style>
+    .warning-row {
+        background: #fff3cd !important;
+    }
+
+    .danger-row {
+        background: #f8d7da !important;
+    }
+    th a {
+    display: block;
+}
+</style>
+
+@php
+function sort_link($label, $field, $sort) {
+    $currentSort = request('sort');
+
+    $direction = 'desc';
+
+    if ($currentSort === $field . '_desc') {
+        $direction = 'asc';
+    }
+
+    $newSort = $field . '_' . $direction;
+
+    $icon = '';
+    if ($currentSort === $field . '_asc') {
+        $icon = ' ▲';
+    } elseif ($currentSort === $field . '_desc') {
+        $icon = ' ▼';
+    }
+
+    $query = request()->query();
+    $query['sort'] = $newSort;
+
+    return '<a href="?' . http_build_query($query) . '" style="color:white; text-decoration:none;">'
+        . $label . $icon . '</a>';
+}
+@endphp
+
 <table>
     <tr>
-        <th rowspan="2">No Pel</th>
+        <th rowspan="2">{!! sort_link('No Pel', 'nopel', $sort) !!}</th>
         <th rowspan="2">Nama</th>
         <th rowspan="2">Alamat</th>
         <th rowspan="2">Status</th>
@@ -213,16 +258,28 @@
     </tr>
 
     <tr>
-        <th>Bulan</th>
+        <th>{!! sort_link('Bulan', 'drd', $sort) !!}</th>
         <th>Tagihan</th>
-        <th>Bulan</th>
+
+        <th>{!! sort_link('Bulan', 'bayar', $sort) !!}</th>
         <th>Tagihan</th>
-        <th>Bulan</th>
+
+        <th>{!! sort_link('Bulan', 'tunggak', $sort) !!}</th>
         <th>Tagihan</th>
     </tr>
 
     @foreach($data as $d)
-    <tr>
+
+    @php
+        $rowClass = '';
+        if ($d->jumlah_bulan_menunggak >= 6) {
+            $rowClass = 'danger-row';
+        } elseif ($d->jumlah_bulan_menunggak >= 3) {
+            $rowClass = 'warning-row';
+        }
+    @endphp
+
+    <tr class="{{ $rowClass }}">
         <td>{{ $d->nopel }}</td>
         <td>{{ $d->nama }}</td>
         <td>{{ $d->alamat }}</td>
@@ -241,6 +298,7 @@
     </tr>
     @endforeach
 
+
 <tr style="background:#e8f2ff; font-weight:bold;">
     <td colspan="6" class="num">TOTAL :</td>
 
@@ -253,6 +311,7 @@
     <td class="center">{{ $totals['bulan_tunggakan'] }}</td>
     <td class="num">{{ number_format($totals['nominal_tunggak'], 0, ',', '.') }}</td>
 </tr>
+
 </table>
 
 @if($perPage === 'all')
