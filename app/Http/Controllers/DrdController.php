@@ -55,7 +55,7 @@ class DrdController extends Controller
                 SUM(d.nominal) as nominal,
                 SUM(d.administrasi) as administrasi,
                 SUM(d.koreksi) as koreksi,
-                SUM(d.total) as total
+                SUM(d.nominal+d.administrasi) as total
             from TR_DRD d
             inner join tr_mutasi m on d.plg_cd = m.plg_cd and m.Mutasi_CD='6'
             left join ft_cabang c on d.cabang_cd = c.cabang_cd
@@ -92,7 +92,7 @@ class DrdController extends Controller
                 SUM(d.nominal) as nominal,
                 SUM(d.administrasi) as administrasi,
                 SUM(d.koreksi) as koreksi,
-                SUM(d.total) as total
+                SUM(d.nominal+d.administrasi) as total
             from TR_DRD d
             inner join tr_mutasi m on d.plg_cd = m.plg_cd and m.Mutasi_CD='6'
             left join ft_cabang c on d.cabang_cd = c.cabang_cd

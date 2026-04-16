@@ -163,23 +163,23 @@ $totalTotal += $row->total;
             {{ $row->zona }}
         </a>
     </td>
-    <td class="right">{{ number_format($row->jumlah) }}</td>
-    <td class="right">{{ number_format($row->kubikasi) }}</td>
-    <td class="right">{{ number_format($row->nominal) }}</td>
-    <td class="right">{{ number_format($row->administrasi) }}</td>
-    <td class="right">{{ number_format($row->koreksi) }}</td>
-    <td class="right">{{ number_format($row->total) }}</td>
+    <td class="right">{{ number_format($row->jumlah, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($row->kubikasi, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($row->nominal, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($row->administrasi, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($row->koreksi, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($row->total, 0, ',', '.') }}</td>
 </tr>
 @endforeach
 
 <tr class="total-row">
     <td>Total</td>
-    <td class="right">{{ number_format($totalJumlah) }}</td>
-    <td class="right">{{ number_format($totalKubikasi) }}</td>
-    <td class="right">{{ number_format($totalNominal) }}</td>
-    <td class="right">{{ number_format($totalAdministrasi) }}</td>
-    <td class="right">{{ number_format($totalKoreksi) }}</td>
-    <td class="right">{{ number_format($totalTotal) }}</td>
+    <td class="right">{{ number_format($totalJumlah, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($totalKubikasi, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($totalNominal, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($totalAdministrasi, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($totalKoreksi, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($totalTotal, 0, ',', '.') }}</td>
 </tr>
 
 </table>
