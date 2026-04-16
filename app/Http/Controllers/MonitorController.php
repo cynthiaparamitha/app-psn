@@ -35,14 +35,14 @@ class MonitorController extends Controller
         )
         ->where('d.Tarif_CD', 'PS')
         ->where('p.Tarif_CD', 'PS')
-        ->whereNotIn('m.Plg_CD', function($sub){
-            $sub->select('plg_cd')
-                ->from('tr_mutasi')
-                ->where('mutasi_cd', '8')
-                ->where('asalnya', 'like', '%PSN%')
-                ->where('nama', 'not like', '%PSN%')
-                ->whereRaw("not nopel = '010303008157'");
-        })
+        // ->whereNotIn('m.Plg_CD', function($sub){
+        //     $sub->select('plg_cd')
+        //         ->from('tr_mutasi')
+        //         ->where('mutasi_cd', '8')
+        //         ->where('asalnya', 'like', '%PSN%')
+        //         ->where('nama', 'not like', '%PSN%')
+        //         ->whereRaw("not nopel = '010303008157'");
+        // })
         ->groupBy('d.Plg_CD', 'p.Nopel', 'p.Nama', 'p.Tarif_CD');
 
         if (!empty($bulan)) {

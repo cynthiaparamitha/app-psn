@@ -63,14 +63,14 @@ class MutasiController extends Controller
                     where mutasi_cd = '6'
                     and tarif_cd = 'PS'
                 )
-                and m.plg_cd not in (
-                    select plg_cd
-                    from tr_mutasi
-                    where mutasi_cd = '8'
-                    and asalnya like '%PSN%'
-                    and nama not like '%PSN%'
-                    and not nopel = '010303008157'
-                )
+ --               and m.plg_cd not in (
+ --                   select plg_cd
+ --                   from tr_mutasi
+ --                   where mutasi_cd = '8'
+ --                   and asalnya like '%PSN%'
+ --                   and nama not like '%PSN%'
+ --                   and not nopel = '010303008157'
+ --               )
                 and m.tabul = ?
                 and m.tabul >= '202412'
                 and m.tabul not in ('210307','301306')

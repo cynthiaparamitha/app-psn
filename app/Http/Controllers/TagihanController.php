@@ -85,15 +85,15 @@ class TagihanController extends Controller
         LEFT JOIN CTE_TUNGGAKAN tng 
             ON tng.plg_cd = p.plg_cd
 
-        WHERE NOT EXISTS (
-            SELECT 1
-            FROM tr_mutasi mx
-            WHERE mx.plg_cd = p.plg_cd
-            AND mx.mutasi_cd = '8'
-            AND mx.asalnya LIKE '%PSN%'
-            AND mx.nama NOT LIKE '%PSN%'
-            AND mx.nopel <> '010303008157'
-        )
+ --       WHERE NOT EXISTS (
+ --           SELECT 1
+ --           FROM tr_mutasi mx
+ --           WHERE mx.plg_cd = p.plg_cd
+ --           AND mx.mutasi_cd = '8'
+ --         AND mx.asalnya LIKE '%PSN%'
+ --         AND mx.nama NOT LIKE '%PSN%'
+ --         AND mx.nopel <> '010303008157'
+ --       )
         ");
 
         $data = collect($rawData);

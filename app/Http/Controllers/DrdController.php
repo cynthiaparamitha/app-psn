@@ -66,14 +66,14 @@ class DrdController extends Controller
                     where mutasi_cd = '6'
                     and tarif_cd = 'PS'
                 )
-                AND m.plg_cd not in (
-                    select plg_cd 
-                    from tr_mutasi 
-                    where mutasi_cd = '8' 
-                    and asalnya like '%PSN%' 
-                    and nama not like '%PSN%' 
-                    and not nopel = '010303008157'
-                )
+                -- AND m.plg_cd not in (
+            --     select plg_cd 
+            --     from tr_mutasi 
+            --     where mutasi_cd = '8' 
+            --     and asalnya like '%PSN%' 
+            --     and nama not like '%PSN%' 
+            --     and not nopel = '010303008157'
+            -- )
                 AND d.tabul = ?
             group by
                 c.zona_cd
@@ -103,14 +103,14 @@ class DrdController extends Controller
                     where mutasi_cd = '6'
                     and tarif_cd = 'PS'
                 )
-                AND m.plg_cd not in (
-                    select plg_cd 
-                    from tr_mutasi 
-                    where mutasi_cd = '8' 
-                    and asalnya like '%PSN%' 
-                    and nama not like '%PSN%' 
-                    and not nopel = '010303008157'
-                )
+                -- AND m.plg_cd not in (
+                --     select plg_cd 
+                --     from tr_mutasi 
+                --     where mutasi_cd = '8' 
+                --     and asalnya like '%PSN%' 
+                --     and nama not like '%PSN%' 
+                --     and not nopel = '010303008157'
+                -- )
                 AND d.tabul = ?
                 AND c.zona_cd = ?
             group by
