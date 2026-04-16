@@ -17,83 +17,90 @@ class TagihanController extends Controller
         $perPage     = $request->perPage ?? 10;
 
         $rawData = DB::select("
-        WITH CTE_DRD_TOTAL AS (
+            WITH
+            CTE_PLG AS (
+                SELECT 
+                    p.plg_cd, 
+                    p.nopel, 
+                    p.nama, 
+                    p.alamat, 
+                    p.status,
+                    p.cabang_cd
+                FROM FT_Plg p
+                INNER JOIN TR_Mutasi m 
+                    ON p.Plg_CD = m.Plg_CD
+                WHERE m.Mutasi_CD = '6'
+            ),
+
+            CTE_DRD_TOTAL AS (
+                SELECT 
+                    plg_cd, 
+                    COUNT(*) AS bulan_drd,
+                    SUM(nominal + administrasi) AS total_tagihan_drd
+                FROM tr_drd
+                WHERE plg_cd IN (SELECT plg_cd FROM CTE_PLG)
+                GROUP BY plg_cd
+            ),
+
+            CTE_AR_LENGKAP AS (
+                SELECT 
+                    v.plg_cd, 
+                    COUNT(*) AS bulan_bayar,
+                    SUM(d.nominal + d.administrasi) AS total_tagihan_ar
+                FROM (
+                    SELECT DISTINCT plg_cd, burek
+                    FROM tr_ar
+                    WHERE ar_cd IN ('001', '003')
+                    GROUP BY plg_cd, burek
+                ) v
+                JOIN tr_drd d 
+                    ON v.plg_cd = d.plg_cd 
+                    AND v.burek = d.tabul
+                GROUP BY v.plg_cd
+            ),
+
+            CTE_TUNGGAKAN AS (
+                SELECT 
+                    plg_cd, 
+                    COUNT(*) AS bulan_tunggak,
+                    SUM(nominal + administrasi) AS total_tagihan_tunggak
+                FROM tr_drd
+                WHERE saldo_ar > 0
+                GROUP BY plg_cd
+            )
+
             SELECT 
-                plg_cd, 
-                COUNT(*) AS bulan_drd,
-                SUM(nominal + administrasi) AS total_tagihan_drd
-            FROM tr_drd
-            GROUP BY plg_cd
-        ),
-        CTE_AR_LENGKAP AS (
-            SELECT 
-                x.plg_cd, 
-                COUNT(*) AS bulan_bayar,
-                SUM(d.nominal + d.administrasi) AS total_tagihan_ar
-            FROM (
-                SELECT plg_cd, burek
-                FROM tr_ar
-                WHERE ar_cd IN ('001','003')
-                GROUP BY plg_cd, burek
-                HAVING COUNT(DISTINCT ar_cd)=2
-            ) x
-            JOIN tr_drd d 
-                ON d.plg_cd = x.plg_cd 
-                AND d.tabul = x.burek
-            GROUP BY x.plg_cd
-        ),
-        CTE_TUNGGAKAN AS (
-            SELECT 
-                plg_cd,
-                COUNT(*) AS bulan_tunggak,
-                SUM(nominal + administrasi) AS total_tagihan_tunggak
-            FROM tr_drd
-            WHERE saldo_ar > 0
-            GROUP BY plg_cd
-        )
+                p.plg_cd, 
+                p.nopel, 
+                p.nama, 
+                p.alamat, 
+                p.status,
+                c.cabang_nm AS cabang,
+                c.zona_cd AS zona,
 
-        SELECT 
-            p.plg_cd, 
-            p.nopel, 
-            p.nama, 
-            p.alamat, 
-            p.status,
-            cab.cabang_nm AS cabang,
-            cab.zona_cd AS zona,
+                ISNULL(drd.bulan_drd, 0) AS jumlah_bulan_drd, 
+                ISNULL(drd.total_tagihan_drd, 0) AS nominal_drd,
 
-            ISNULL(drd.bulan_drd, 0) AS jumlah_bulan_drd,
-            ISNULL(drd.total_tagihan_drd, 0) AS nominal_drd,
+                ISNULL(ar.bulan_bayar, 0) AS jumlah_bulan_bayar,
+                ISNULL(ar.total_tagihan_ar, 0) AS nominal_ar,
 
-            ISNULL(ar.bulan_bayar, 0) AS jumlah_bulan_bayar,
-            ISNULL(ar.total_tagihan_ar, 0) AS nominal_ar,
+                ISNULL(tng.bulan_tunggak, 0) AS jumlah_bulan_menunggak,
+                ISNULL(tng.total_tagihan_tunggak, 0) AS nominal_tunggakan
 
-            ISNULL(tng.bulan_tunggak, 0) AS jumlah_bulan_menunggak,
-            ISNULL(tng.total_tagihan_tunggak, 0) AS nominal_tunggakan
+            FROM CTE_PLG p
+            INNER JOIN TR_Mutasi m 
+                ON m.Plg_CD = p.Plg_CD 
+                AND m.Mutasi_CD = '6'
+            LEFT JOIN ft_cabang c 
+                ON p.cabang_cd = c.cabang_cd
+            LEFT JOIN CTE_DRD_TOTAL drd 
+                ON p.plg_cd = drd.plg_cd
+            LEFT JOIN CTE_AR_LENGKAP ar 
+                ON p.plg_cd = ar.plg_cd
+            LEFT JOIN CTE_TUNGGAKAN tng 
+                ON p.plg_cd = tng.plg_cd
 
-        FROM ft_plg p
-        INNER JOIN tr_mutasi m 
-            ON m.plg_cd = p.plg_cd 
-            AND m.mutasi_cd = '6' 
-            AND m.tarif_cd = 'PS'
-
-        LEFT JOIN ft_cabang cab 
-            ON cab.cabang_cd = p.cabang_cd
-        LEFT JOIN CTE_DRD_TOTAL drd 
-            ON drd.plg_cd = p.plg_cd
-        LEFT JOIN CTE_AR_LENGKAP ar 
-            ON ar.plg_cd = p.plg_cd
-        LEFT JOIN CTE_TUNGGAKAN tng 
-            ON tng.plg_cd = p.plg_cd
-
- --       WHERE NOT EXISTS (
- --           SELECT 1
- --           FROM tr_mutasi mx
- --           WHERE mx.plg_cd = p.plg_cd
- --           AND mx.mutasi_cd = '8'
- --         AND mx.asalnya LIKE '%PSN%'
- --         AND mx.nama NOT LIKE '%PSN%'
- --         AND mx.nopel <> '010303008157'
- --       )
+            WHERE m.tarif_cd = 'PS'
         ");
 
         $data = collect($rawData);
