@@ -40,53 +40,19 @@ class PelangganController extends Controller
 
         $nextOrder = ($order === 'asc') ? 'desc' : 'asc';
 
-        $basePSN = DB::table('ft_plg as p')
-            ->leftJoin('ft_tarif_2013 as t', 'p.tarif_cd', '=', 't.tarif_cd')
-            ->leftJoin('ft_cabang as c', 'p.cabang_cd', '=', 'c.cabang_cd')
-            ->whereIn('p.plg_cd', function ($sub) {
-                $sub->select('plg_cd')
-                    ->from('tr_mutasi')
-                    ->where('mutasi_cd', '6')
-                    ->where('tarif_cd', 'PS');
-            })
-            // ->whereNotIn('p.plg_cd', function ($sub2) {
-            //     $sub2->select('plg_cd')
-            //         ->from('tr_mutasi')
-            //         ->where('mutasi_cd', '8')
-            //         ->where('asalnya', 'like', '%PSN%')
-            //         ->where('nama', 'not like', '%PSN%')
-            //         ->where('nopel', '!=', '010303008157');
-            // })
-            ;
-
-        $tarifList  = (clone $basePSN)->select('t.tarif_cd')->distinct()->pluck('tarif_cd');
-        $cabangList = (clone $basePSN)->select('c.cabang_nm')->distinct()->pluck('c.cabang_nm');
-        $zonaList   = (clone $basePSN)->select('c.zona_cd')->distinct()->pluck('c.zona_cd');
-        $statusList = (clone $basePSN)->select('p.status')->distinct()->pluck('status');
-
-        $query = (clone $basePSN)
-            ->select(
-                'p.nopel',
-                'p.nama',
-                'p.alamat',
-                't.tarif_cd as kode_tarif',
-                'p.meter_no as no_meter',
-                'c.cabang_nm as cabang',
-                'c.zona_cd as zona',
-                'p.status'
-            );
+        $query = DB::table('vw_pelanggan_psn');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
-                $q->where('p.nopel', 'like', "%$search%")
-                  ->orWhere('p.nama', 'like', "%$search%");
+                $q->where('nopel', 'like', "%$search%")
+                ->orWhere('nama', 'like', "%$search%");
             });
         }
 
-        if ($tarif)  $query->where('t.tarif_cd', $tarif);
-        if ($cabang) $query->where('c.cabang_nm', $cabang);
-        if ($status) $query->where('p.status', $status);
-        if ($zona)   $query->where('c.zona_cd', $zona);
+        if ($tarif)  $query->where('kode_tarif', $tarif);
+        if ($cabang) $query->where('cabang', $cabang);
+        if ($status) $query->where('status', $status);
+        if ($zona)   $query->where('zona', $zona);
 
         $query->orderBy(DB::raw("LOWER($sort)"), $order);
 
@@ -95,6 +61,11 @@ class PelangganController extends Controller
         } else {
             $data = $query->paginate($perPage)->withQueryString();
         }
+
+        $tarifList  = DB::table('vw_pelanggan_psn')->select('kode_tarif')->distinct()->pluck('kode_tarif');
+        $cabangList = DB::table('vw_pelanggan_psn')->select('cabang')->distinct()->pluck('cabang');
+        $zonaList   = DB::table('vw_pelanggan_psn')->select('zona')->distinct()->pluck('zona');
+        $statusList = DB::table('vw_pelanggan_psn')->select('status')->distinct()->pluck('status');
 
         return view('pelanggan.index', compact(
             'data', 'search', 'tarif', 'cabang', 'status', 'zona',
@@ -106,51 +77,19 @@ class PelangganController extends Controller
 
     public function rekap(Request $request)
     {
-        $search = $request->search;
-        $tarif  = $request->tarif;
-        $cabang = $request->cabang;
-        $status = $request->status;
-        $zona   = $request->zona;
+        $query = DB::table('vw_pelanggan_psn');
 
-        $query = DB::table('ft_plg as p')
-            ->leftJoin('ft_tarif_2013 as t', 'p.tarif_cd', '=', 't.tarif_cd')
-            ->leftJoin('ft_cabang as c', 'p.cabang_cd', '=', 'c.cabang_cd')
-            ->whereIn('p.plg_cd', function ($sub) {
-                $sub->select('plg_cd')
-                    ->from('tr_mutasi')
-                    ->where('mutasi_cd', '6')
-                    ->where('tarif_cd', 'PS');
-            })
-            // ->whereNotIn('p.plg_cd', function ($sub2) {
-            //     $sub2->select('plg_cd')
-            //         ->from('tr_mutasi')
-            //         ->where('mutasi_cd', '8')
-            //         ->where('asalnya', 'like', '%PSN%')
-            //         ->where('nama', 'not like', '%PSN%')
-            //         ->where('nopel', '!=', '010303008157');
-            // })
-            ->select(
-                'p.nopel',
-                'p.nama',
-                'p.alamat',
-                't.tarif_cd as kode_tarif',
-                'p.meter_no as no_meter',
-                'c.cabang_nm as cabang',
-                'c.zona_cd as zona',
-                'p.status'
-            );
-
-        if ($search) {
-            $query->where(function ($q) use ($search) {
-                $q->where('p.nopel', 'like', "%$search%")
-                  ->orWhere('p.nama', 'like', "%$search%");
+        if ($request->search) {
+            $query->where(function ($q) use ($request) {
+                $q->where('nopel', 'like', "%{$request->search}%")
+                ->orWhere('nama', 'like', "%{$request->search}%");
             });
         }
 
-        if ($tarif)  $query->where('t.tarif_cd', $tarif);
-        if ($cabang) $query->where('c.cabang_nm', $cabang);
-        if ($status) $query->where('p.status', $status);
-        if ($zona)   $query->where('c.zona_cd', $zona);
+        if ($request->tarif)  $query->where('kode_tarif', $request->tarif);
+        if ($request->cabang) $query->where('cabang', $request->cabang);
+        if ($request->status) $query->where('status', $request->status);
+        if ($request->zona)   $query->where('zona', $request->zona);
 
         $data = $query->get();
 

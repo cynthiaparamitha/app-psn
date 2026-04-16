@@ -7,6 +7,15 @@ use Illuminate\Support\Facades\DB;
 
 class MonitorController extends Controller
 {
+
+    public function __construct()
+    {
+        if (!session()->has('user')) {
+            redirect('/login')->send();
+            exit;
+        }
+    }
+
     public function tarif(Request $request)
     {
         $bulan = $request->bulan;
@@ -20,36 +29,13 @@ class MonitorController extends Controller
             $perPage = 10;
         }
 
-        $query = DB::table('TR_DRD as d')
-        ->join('FT_Plg as p', 'p.Plg_CD', '=', 'd.Plg_CD')
-        ->join('TR_Mutasi as m', function ($join) {
-            $join->on('m.Plg_CD', '=', 'p.Plg_CD')
-                ->where('m.Mutasi_CD', '=', '6');
-        })
-        ->select(
-            'd.Plg_CD',
-            'p.Nopel',
-            'p.Nama',
-            'p.Tarif_CD as Tarif',
-            DB::raw('COUNT(*) as bulan')
-        )
-        ->where('d.Tarif_CD', 'PS')
-        ->where('p.Tarif_CD', 'PS')
-        // ->whereNotIn('m.Plg_CD', function($sub){
-        //     $sub->select('plg_cd')
-        //         ->from('tr_mutasi')
-        //         ->where('mutasi_cd', '8')
-        //         ->where('asalnya', 'like', '%PSN%')
-        //         ->where('nama', 'not like', '%PSN%')
-        //         ->whereRaw("not nopel = '010303008157'");
-        // })
-        ->groupBy('d.Plg_CD', 'p.Nopel', 'p.Nama', 'p.Tarif_CD');
+        $query = DB::table('vw_monitor_tarif_ps');
 
         if (!empty($bulan)) {
             if ($bulan == 6) {
-                $query->having(DB::raw('COUNT(*)'), '>=', 6);
+                $query->where('bulan', '>=', 6);
             } else {
-                $query->having(DB::raw('COUNT(*)'), '=', $bulan);
+                $query->where('bulan', '=', $bulan);
             }
         }
 

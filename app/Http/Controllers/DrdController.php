@@ -9,7 +9,6 @@ class DrdController extends Controller
 {
     public function __construct()
     {
-        // Cek apakah sudah login
         if (!session()->has('user')) {
             redirect('/login')->send();
             exit;
@@ -21,17 +20,10 @@ class DrdController extends Controller
         $tabul = $request->tabul;
         $zona  = $request->zona;
 
-        $listTabul = DB::table('TR_DRD as d')
-            ->join('tr_mutasi as m', 'd.Nopel', '=', 'm.Nopel')
-            ->whereIn('m.plg_cd', function ($q) {
-                $q->select('plg_cd')
-                  ->from('tr_mutasi')
-                  ->where('mutasi_cd', '6')
-                  ->where('tarif_cd', 'PS');
-            })
-            ->select('d.tabul')
+        $listTabul = DB::table('vw_drd_zona_psn')
+            ->select('tabul')
             ->distinct()
-            ->orderBy('d.tabul', 'desc')
+            ->orderBy('tabul', 'desc')
             ->get();
 
         if (!$tabul) {
@@ -42,83 +34,25 @@ class DrdController extends Controller
             return view('drd.index_zona', [
                 'data'      => [],
                 'listTabul' => $listTabul,
-                'tabul'     => null
+                'tabul'     => null,
             ]);
         }
 
         if (!$zona) {
-            $data = DB::select("
-            select
-                c.zona_cd as zona,
-                COUNT(distinct d.plg_cd) AS jumlah,
-                SUM(d.Kubikasi) AS kubikasi,
-                SUM(d.nominal) as nominal,
-                SUM(d.administrasi) as administrasi,
-                SUM(d.koreksi) as koreksi,
-                SUM(d.nominal+d.administrasi) as total
-            from TR_DRD d
-            inner join tr_mutasi m on d.plg_cd = m.plg_cd and m.Mutasi_CD='6'
-            left join ft_cabang c on d.cabang_cd = c.cabang_cd
-            where
-                m.plg_cd in (
-                    select plg_cd
-                    from tr_mutasi
-                    where mutasi_cd = '6'
-                    and tarif_cd = 'PS'
-                )
-                -- AND m.plg_cd not in (
-            --     select plg_cd 
-            --     from tr_mutasi 
-            --     where mutasi_cd = '8' 
-            --     and asalnya like '%PSN%' 
-            --     and nama not like '%PSN%' 
-            --     and not nopel = '010303008157'
-            -- )
-                AND d.tabul = ?
-            group by
-                c.zona_cd
-            order by
-                c.zona_cd
-        ", [$tabul]);
+            $data = DB::table('vw_drd_zona_psn')
+                ->where('tabul', $tabul)
+                ->orderBy('zona')
+                ->get();
 
             return view('drd.index_zona', compact('data', 'listTabul', 'tabul'));
         }
 
-            $data = DB::select("
-            select
-                c.cabang_nm as cabang,
-                COUNT(distinct d.nopel) AS jumlah,
-                SUM(d.Kubikasi) AS kubikasi,
-                SUM(d.nominal) as nominal,
-                SUM(d.administrasi) as administrasi,
-                SUM(d.koreksi) as koreksi,
-                SUM(d.nominal+d.administrasi) as total
-            from TR_DRD d
-            inner join tr_mutasi m on d.plg_cd = m.plg_cd and m.Mutasi_CD='6'
-            left join ft_cabang c on d.cabang_cd = c.cabang_cd
-            where
-                m.plg_cd in (
-                    select plg_cd
-                    from tr_mutasi
-                    where mutasi_cd = '6'
-                    and tarif_cd = 'PS'
-                )
-                -- AND m.plg_cd not in (
-                --     select plg_cd 
-                --     from tr_mutasi 
-                --     where mutasi_cd = '8' 
-                --     and asalnya like '%PSN%' 
-                --     and nama not like '%PSN%' 
-                --     and not nopel = '010303008157'
-                -- )
-                AND d.tabul = ?
-                AND c.zona_cd = ?
-            group by
-                c.cabang_nm, d.cabang_cd
-            order by
-                d.cabang_cd
-        ", [$tabul, $zona]);
+        $data = DB::table('vw_drd_cabang_psn')
+            ->where('tabul', $tabul)
+            ->where('zona', $zona)
+            ->orderBy('cabang')
+            ->get();
 
-        return view('drd.index_cabang', compact('data','listTabul','tabul','zona'));
+        return view('drd.index_cabang', compact('data', 'listTabul', 'tabul', 'zona'));
     }
 }

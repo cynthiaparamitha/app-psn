@@ -8,6 +8,14 @@ use Illuminate\Pagination\LengthAwarePaginator;
 
 class TagihanController extends Controller
 {
+    public function __construct()
+    {
+        if (!session()->has('user')) {
+            redirect('/login')->send();
+            exit;
+        }
+    }
+    
     public function index(Request $request)
     {
         $search    = $request->search;
