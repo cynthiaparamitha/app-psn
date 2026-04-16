@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DrdController;
+use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\MutasiController;
 use App\Http\Controllers\PelangganController;
 use App\Http\Controllers\MonitorController;
@@ -17,6 +18,8 @@ Route::get('/', function () {
 });
 
 Route::get('/drd', [DrdController::class, 'index'])->name('drd.index');
+
+Route::get('/pemakaian', [PemakaianController::class, 'index'])->name('pemakaian.index');
 
 Route::get('/mutasi', [MutasiController::class, 'index'])->name('mutasi.index');
 
