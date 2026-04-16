@@ -17,7 +17,6 @@
         font-weight: bold;
     }
 
-    /* FILTER BOX */
     .filter-box {
         background: #ffffff;
         padding: 12px 15px;
@@ -61,7 +60,6 @@
         text-decoration: underline;
     }
 
-    /* TABLE */
     table {
         width: 100%;
         border-collapse: collapse;
@@ -95,7 +93,18 @@
     .num { text-align: right; }
     .center { text-align: center; }
 
-    .pagination {
+    .warning-row {
+        background: #fff3cd !important;
+    }
+
+    .danger-row {
+        background: #f8d7da !important;
+    }
+
+    th a {
+        display: block;
+    }
+        .pagination {
         display: flex;
         list-style: none;
         padding-left: 0;
@@ -131,14 +140,14 @@
 @include('layouts.navbar')
 
 @php
-    $total_bulan_drd       = $data->sum('jumlah_bulan_drd');
-    $total_nominal_drd     = $data->sum('nominal_drd');
+    $total_bulan_drd       = $fullTotal['bulan_drd'];
+    $total_nominal_drd     = $fullTotal['nom_drd'];
 
-    $total_bulan_bayar     = $data->sum('jumlah_bulan_bayar');
-    $total_nominal_bayar   = $data->sum('nominal_ar');
+    $total_bulan_bayar     = $fullTotal['bulan_bayar'];
+    $total_nominal_bayar   = $fullTotal['nom_bayar'];
 
-    $total_bulan_tunggakan = $data->sum('jumlah_bulan_menunggak');
-    $total_nominal_tunggak = $data->sum('nominal_tunggakan');
+    $total_bulan_tunggakan = $fullTotal['bulan_tunggak'];
+    $total_nominal_tunggak = $fullTotal['nom_tunggak'];
 @endphp
 
 <h2>Tagihan PSN</h2>
@@ -203,23 +212,9 @@
 </form>
 </div>
 
-<style>
-    .warning-row {
-        background: #fff3cd !important;
-    }
-
-    .danger-row {
-        background: #f8d7da !important;
-    }
-    th a {
-    display: block;
-}
-</style>
-
 @php
 function sort_link($label, $field, $sort) {
     $currentSort = request('sort');
-
     $direction = 'desc';
 
     if ($currentSort === $field . '_desc') {
@@ -272,9 +267,9 @@ function sort_link($label, $field, $sort) {
 
     @php
         $rowClass = '';
-        if ($d->jumlah_bulan_menunggak >= 6) {
+        if ($d->tunggakan_bulan >= 6) {
             $rowClass = 'danger-row';
-        } elseif ($d->jumlah_bulan_menunggak >= 3) {
+        } elseif ($d->tunggakan_bulan >= 3) {
             $rowClass = 'warning-row';
         }
     @endphp
@@ -287,14 +282,14 @@ function sort_link($label, $field, $sort) {
         <td>{{ $d->cabang }}</td>
         <td>{{ $d->zona }}</td>
 
-        <td class="center">{{ $d->jumlah_bulan_drd }}</td>
-        <td class="num">{{ number_format($d->nominal_drd, 0, ',', '.') }}</td>
+        <td class="center">{{ $d->drd_bulan }}</td>
+        <td class="num">{{ number_format($d->drd_tagihan, 0, ',', '.') }}</td>
 
-        <td class="center">{{ $d->jumlah_bulan_bayar }}</td>
-        <td class="num">{{ number_format($d->nominal_ar, 0, ',', '.') }}</td>
+        <td class="center">{{ $d->pembayaran_bulan }}</td>
+        <td class="num">{{ number_format($d->pembayaran_tagihan, 0, ',', '.') }}</td>
 
-        <td class="center">{{ $d->jumlah_bulan_menunggak }}</td>
-        <td class="num">{{ number_format($d->nominal_tunggakan, 0, ',', '.') }}</td>
+        <td class="center">{{ $d->tunggakan_bulan }}</td>
+        <td class="num">{{ number_format($d->tunggakan_tagihan, 0, ',', '.') }}</td>
     </tr>
     @endforeach
 
@@ -302,14 +297,14 @@ function sort_link($label, $field, $sort) {
 <tr style="background:#e8f2ff; font-weight:bold;">
     <td colspan="6" class="num">TOTAL :</td>
 
-    <td class="center">{{ $totals['bulan_drd'] }}</td>
-    <td class="num">{{ number_format($totals['nominal_drd'], 0, ',', '.') }}</td>
+    <td class="center">{{ $total_bulan_drd }}</td>
+    <td class="num">{{ number_format($total_nominal_drd, 0, ',', '.') }}</td>
 
-    <td class="center">{{ $totals['bulan_bayar'] }}</td>
-    <td class="num">{{ number_format($totals['nominal_bayar'], 0, ',', '.') }}</td>
+    <td class="center">{{ $total_bulan_bayar }}</td>
+    <td class="num">{{ number_format($total_nominal_bayar, 0, ',', '.') }}</td>
 
-    <td class="center">{{ $totals['bulan_tunggakan'] }}</td>
-    <td class="num">{{ number_format($totals['nominal_tunggak'], 0, ',', '.') }}</td>
+    <td class="center">{{ $total_bulan_tunggakan }}</td>
+    <td class="num">{{ number_format($total_nominal_tunggak, 0, ',', '.') }}</td>
 </tr>
 
 </table>
@@ -328,11 +323,7 @@ function sort_link($label, $field, $sort) {
         of {{ $data->total() }} data
     </div>
 
-    <div style="display:flex; gap:8px; align-items:center;">
-
-    {{ $data->onEachSide(0)->links('pagination::simple-default') }}
-
-</div>
+    <div>{{ $data->onEachSide(0)->links('pagination::simple-default') }}</div>
 
 </div>
 @endif
