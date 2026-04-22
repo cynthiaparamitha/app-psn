@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DrdController;
+use App\Http\Controllers\PasangController;
 use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\MutasiController;
 use App\Http\Controllers\PelangganController;
@@ -18,6 +19,8 @@ Route::get('/', function () {
 });
 
 Route::get('/drd', [DrdController::class, 'index'])->name('drd.index');
+
+Route::get('/pasang', [PasangController::class, 'index'])->name('pasang.index');
 
 Route::get('/pemakaian', [PemakaianController::class, 'index'])->name('pemakaian.index');
 
