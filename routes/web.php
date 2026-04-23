@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DrdController;
+use App\Http\Controllers\LhkController;
 use App\Http\Controllers\PasangController;
 use App\Http\Controllers\PemakaianController;
 use App\Http\Controllers\MutasiController;
@@ -19,6 +20,8 @@ Route::get('/', function () {
 });
 
 Route::get('/drd', [DrdController::class, 'index'])->name('drd.index');
+
+Route::get('/lhk', [LhkController::class, 'index'])->name('lhk.index');
 
 Route::get('/pasang', [PasangController::class, 'index'])->name('pasang.index');
 

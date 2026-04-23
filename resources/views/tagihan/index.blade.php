@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Tagihan PSN</title>
+    <title>Laporan Tagihan PSN</title>
 
 <style>
     body {
@@ -150,7 +150,7 @@
     $total_nominal_tunggak = $fullTotal['nom_tunggak'];
 @endphp
 
-<h2>Tagihan PSN</h2>
+<h2>Laporan Tagihan</h2>
 
 <div class="filter-box">
 <form method="GET" action="">

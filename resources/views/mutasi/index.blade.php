@@ -83,7 +83,7 @@
 
 @include('layouts.navbar')
 
-<h2>Laporan Mutasi PSN</h2>
+<h2>Laporan Mutasi</h2>
 
 <div class="filter-box">
     <form method="GET">

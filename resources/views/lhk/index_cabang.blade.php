@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan DRD PSN</title>
+    <title>LHK PSN</title>
 
 <style>
     .back-btn {
@@ -100,96 +100,84 @@
 </head>
 <body>
 
-
 @include('layouts.navbar')
 
-<h2>Laporan DRD - Zona {{ $zona ?? '' }}</h2>
+<h2>Laporan Harian Kas - Zona {{ $zona }}</h2>
 
 <div class="filter-box">
-<form method="GET">
-    <input type="hidden" name="zona" value="{{ $zona }}">
+    <form method="GET">
+        <input type="hidden" name="zona" value="{{ $zona }}">
 
-    <label><b>Periode:</b></label>
-
-    <select name="tabul" onchange="this.form.submit()">
+        <label><b>Periode:</b></label>
+        <select name="tabul" onchange="this.form.submit()">
 
             @php
-                $bulanSingkat = [
-                    '01' => 'Jan','02' => 'Feb','03' => 'Mar','04' => 'Apr',
-                    '05' => 'Mei','06' => 'Jun','07' => 'Jul','08' => 'Ags',
-                    '09' => 'Sep','10' => 'Okt','11' => 'Nov','12' => 'Des'
+                $bulan = [
+                    '01'=>'Jan','02'=>'Feb','03'=>'Mar','04'=>'Apr',
+                    '05'=>'Mei','06'=>'Jun','07'=>'Jul','08'=>'Ags',
+                    '09'=>'Sep','10'=>'Okt','11'=>'Nov','12'=>'Des'
                 ];
             @endphp
 
             @foreach($listTabul as $t)
-
                 @php
-                    $tahun = substr($t->tabul, 0, 4);
-                    $bulan = substr($t->tabul, 4, 2);
-                    $label = $bulanSingkat[$bulan] . ' ' . $tahun;
+                    $yr = substr($t->tabul,0,4);
+                    $mo = substr($t->tabul,4,2);
                 @endphp
 
-                <option value="{{ $t->tabul }}" {{ $tabul == $t->tabul ? 'selected' : '' }}>
-                    {{ $label }}
+                <option value="{{ $t->tabul }}" {{ $tabul==$t->tabul?'selected':'' }}>
+                    {{ $bulan[$mo] }} {{ $yr }}
                 </option>
-
             @endforeach
+
         </select>
     </form>
 </div>
 
+<a href="/lhk?tabul={{ $tabul }}" class="back-btn">← Kembali ke Zona</a>
+
 <table>
 <tr>
     <th>K. Pelayanan</th>
-    <th>Jumlah</th>
-    <th>Kubik</th>
-    <th>Nominal Air</th>
+    <th>Air</th>
     <th>Administrasi</th>
-    <th>Koreksi Air</th>
+    <th>Denda</th>
+    <th>NAL</th>
     <th>Total</th>
 </tr>
-<a href="/drd?tabul={{ $tabul }}" class="back-btn">← Kembali ke Zona</a>
 
 @php
-$totalJumlah = 0;
-$totalKubikasi = 0;
-$totalNominal = 0;
-$totalAdministrasi = 0;
-$totalKoreksi = 0;
-$totalTotal = 0;
+    $totalAir=0; $totalAdm=0; $totalDenda=0; $totalNAL=0; $totalAll=0;
 @endphp
 
 @foreach($data as $row)
 
 @php
-$totalJumlah += $row->jumlah;
-$totalKubikasi += $row->kubikasi;
-$totalNominal += $row->nominal;
-$totalAdministrasi += $row->administrasi;
-$totalKoreksi += $row->koreksi;
-$totalTotal += $row->total;
+    $totalAir += $row->air;
+    $totalAdm += $row->administrasi;
+    $totalDenda += $row->denda;
+    $totalNAL += $row->NAL;
+    $totalAll += $row->total;
 @endphp
 
 <tr>
     <td>{{ $row->cabang }}</td>
-    <td class="right">{{ number_format($row->jumlah, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($row->kubikasi, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($row->nominal, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($row->administrasi, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($row->koreksi, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($row->total, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($row->air,0,',','.') }}</td>
+    <td class="right">{{ number_format($row->administrasi,0,',','.') }}</td>
+    <td class="right">{{ number_format($row->denda,0,',','.') }}</td>
+    <td class="right">{{ number_format($row->NAL,0,',','.') }}</td>
+    <td class="right">{{ number_format($row->total,0,',','.') }}</td>
 </tr>
 
 @endforeach
 
 <tr class="total-row">
     <td>Total</td>
-    <td class="right">{{ number_format($totalJumlah, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($totalKubikasi, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($totalNominal, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($totalAdministrasi, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($totalKoreksi, 0, ',', '.') }}</td>
-    <td class="right">{{ number_format($totalTotal, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($totalAir,0,',','.') }}</td>
+    <td class="right">{{ number_format($totalAdm,0,',','.') }}</td>
+    <td class="right">{{ number_format($totalDenda,0,',','.') }}</td>
+    <td class="right">{{ number_format($totalNAL,0,',','.') }}</td>
+    <td class="right">{{ number_format($totalAll,0,',','.') }}</td>
 </tr>
 
 </table>

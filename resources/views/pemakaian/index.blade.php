@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan Pemakaian PSN - Zona</title>
+    <title>Laporan Pemakaian PSN</title>
 
     <style>
         body { font-family: Arial; background: #f4f6f9; margin: 20px; }
@@ -47,7 +47,7 @@
 
 @include('layouts.navbar')
 
-<h2>Laporan Pemakaian PSN</h2>
+<h2>Laporan Pemakaian</h2>
 
 <div class="filter-box">
     <form method="GET">

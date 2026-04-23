@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Laporan DRD PSN - Zona</title>
+    <title>Laporan DRD PSN</title>
 
     <style>
         body {
@@ -94,7 +94,7 @@
 
 @include('layouts.navbar')
 
-<h2>Laporan DRD PSN</h2>
+<h2>Laporan DRD</h2>
 
 <div class="filter-box">
     <form method="GET">

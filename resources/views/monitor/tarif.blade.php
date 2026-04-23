@@ -113,7 +113,7 @@
 
 @include('layouts.navbar')
 
-<h2>Monitoring Tarif PSN</h2>
+<h2>Monitoring Tarif</h2>
 
 <div class="filter-box">
     <form method="GET">

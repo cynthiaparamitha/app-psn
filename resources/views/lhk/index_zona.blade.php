@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Progress Pemasangan PSN</title>
+    <title>LHK PSN</title>
 
     <style>
         body {
@@ -73,85 +73,111 @@
             font-variant-numeric: tabular-nums;
         }
 
-        .progress {
+        .zona-link {
             font-weight: bold;
-            color: #2c3e50;
+            color: #2980b9;
+            text-decoration: none;
         }
 
+        .zona-link:hover {
+            text-decoration: underline;
+        }
+
+        .total-row {
+            background: #27ae60 !important;
+            color: white;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
 
 @include('layouts.navbar')
 
-<h2>Progress Pemasangan Per Zona</h2>
+<h2>Laporan Harian Kas</h2>
 
 <div class="filter-box">
     <form method="GET">
         <label><b>Periode:</b></label>
 
         <select name="tabul" onchange="this.form.submit()">
+
             @php
                 $bulanSingkat = [
-                    '01'=>'Jan','02'=>'Feb','03'=>'Mar','04'=>'Apr',
-                    '05'=>'Mei','06'=>'Jun','07'=>'Jul','08'=>'Ags',
-                    '09'=>'Sep','10'=>'Okt','11'=>'Nov','12'=>'Des'
+                    '01' => 'Jan','02' => 'Feb','03' => 'Mar','04' => 'Apr',
+                    '05' => 'Mei','06' => 'Jun','07' => 'Jul','08' => 'Ags',
+                    '09' => 'Sep','10' => 'Okt','11' => 'Nov','12' => 'Des'
                 ];
             @endphp
 
             @foreach($listTabul as $t)
+
                 @php
-                    $th = substr($t->tabul, 0, 4);
-                    $bl = substr($t->tabul, 4, 2);
+                    $tahun = substr($t->tabul, 0, 4);
+                    $bulan = substr($t->tabul, 4, 2);
+                    $label = $bulanSingkat[$bulan] . ' ' . $tahun;
                 @endphp
 
                 <option value="{{ $t->tabul }}" {{ $tabul == $t->tabul ? 'selected' : '' }}>
-                    {{ $bulanSingkat[$bl] }} {{ $th }}
+                    {{ $label }}
                 </option>
+
             @endforeach
         </select>
     </form>
 </div>
 
-@php
-function romawi($angka) {
-    $map = [
-        1=>'I',2=>'II',3=>'III',4=>'IV'
-    ];
-    return $map[$angka] ?? $angka;
-}
-@endphp
-
 <table>
 <tr>
-    <th>No</th>
     <th>Zona</th>
-    <th>Progress Pasang</th>
-    <th>Pendaftar</th>
-    <th>Pasang</th>
-    <th>Mutasi Pelanggan Baru</th>
+    <th>Air</th>
+    <th>Administrasi</th>
+    <th>Denda</th>
+    <th>NAL</th>
+    <th>Total</th>
 </tr>
 
-@foreach($data as $i => $row)
+@php
+$totalAir = 0;
+$totalAdm = 0;
+$totalDenda = 0;
+$totalNAL = 0;
+$totalAll = 0;
+@endphp
+
+@foreach($data as $row)
 
 @php
-$pendaftar = $row->Pendaftar ?? 0;
-$pasang    = $row->Terpasang ?? 0;
-$mutasi    = $row->Mutasi_Pelanggan ?? 0;
-
-$progress = $pendaftar > 0 ? "$pasang/$pendaftar" : '0/0';
+    $totalAir += $row->air;
+    $totalAdm += $row->administrasi;
+    $totalDenda += $row->denda;
+    $totalNAL += $row->NAL;
+    $totalAll += $row->total;
 @endphp
 
 <tr>
-    <td class="left">{{ $i + 1 }}</td>
-    <td>Zona {{ romawi($row->zona) }}</td>
-    <td class="right progress">{{ $progress }}</td>
-    <td class="right">{{ number_format($pendaftar,0,',','.') }}</td>
-    <td class="right">{{ number_format($pasang,0,',','.') }}</td>
-    <td class="right">{{ number_format($mutasi,0,',','.') }}</td>
+    <td>
+        <a class="zona-link" href="?tabul={{ $tabul }}&zona={{ $row->zona }}">
+            {{ $row->zona }}
+        </a>
+    </td>
+    <td class="right">{{ number_format($row->air,0,',','.') }}</td>
+    <td class="right">{{ number_format($row->administrasi,0,',','.') }}</td>
+    <td class="right">{{ number_format($row->denda,0,',','.') }}</td>
+    <td class="right">{{ number_format($row->NAL,0,',','.') }}</td>
+    <td class="right">{{ number_format($row->total,0,',','.') }}</td>
 </tr>
 
 @endforeach
+
+<tr class="total-row">
+    <td>Total</td>
+    <td class="right">{{ number_format($totalAir,0,',','.') }}</td>
+    <td class="right">{{ number_format($totalAdm,0,',','.') }}</td>
+    <td class="right">{{ number_format($totalDenda,0,',','.') }}</td>
+    <td class="right">{{ number_format($totalNAL,0,',','.') }}</td>
+    <td class="right">{{ number_format($totalAll,0,',','.') }}</td>
+</tr>
 
 </table>
 

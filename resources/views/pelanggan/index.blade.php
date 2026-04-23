@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Detail Pelanggan</title>
+    <title>Detail Pelanggan PSN</title>
 
 <style>
     body {
@@ -149,7 +149,7 @@
 
 @include('layouts.navbar')
 
-<h2>Detail Pelanggan PSN</h2>
+<h2>Detail Pelanggan</h2>
 
 <div class="filter-box">
 <form method="GET">

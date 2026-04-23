@@ -97,7 +97,7 @@ tr:nth-child(even) {
 
 @include('layouts.navbar')
 
-<h2>📊 Rekapan Pelanggan PSN</h2>
+<h2>📊 Rekapan Pelanggan</h2>
 <a href="{{ url()->previous() }}" class="back-btn">← Kembali</a>
 
 <div class="card">

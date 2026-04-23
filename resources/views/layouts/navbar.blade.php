@@ -1,11 +1,12 @@
 <nav class="navbar">
-    <div class="nav-brand">Aplikasi Laporan</div>
+    <div class="nav-brand">Aplikasi Laporan PSN</div>
 
     <input type="checkbox" id="nav-toggle" class="nav-toggle">
     <label for="nav-toggle" class="nav-icon">&#9776;</label>
 
     <ul class="nav-menu">
         <li><a href="{{ route('drd.index') }}" class="{{ request()->is('drd') ? 'active' : '' }}">DRD</a></li>
+        <li><a href="{{ route('lhk.index') }}" class="{{ request()->is('lhk') ? 'active' : '' }}">LHK</a></li>
         <li><a href="{{ route('pasang.index') }}" class="{{ request()->is('pasang') ? 'active' : '' }}">Pemasangan</a></li>
         <li><a href="{{ route('pemakaian.index') }}" class="{{ request()->is('pemakaian') ? 'active' : '' }}">Pemakaian</a></li>
         <li><a href="{{ route('mutasi.index') }}" class="{{ request()->is('mutasi') ? 'active' : '' }}">Mutasi</a></li>
