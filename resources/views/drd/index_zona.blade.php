@@ -136,6 +136,8 @@
     <th>Administrasi</th>
     <th>Koreksi Air</th>
     <th>Total</th>
+    <th>Efektivitas (%)</th>
+    <th>Efisiensi (%)</th>
 </tr>
 
 @php
@@ -145,6 +147,9 @@ $totalNominal = 0;
 $totalAdministrasi = 0;
 $totalKoreksi = 0;
 $totalTotal = 0;
+$totalEfektivitas = 0;
+$totalEfisiensi = 0;
+$jumlahBaris = count($data);
 @endphp
 
 @foreach($data as $row)
@@ -155,6 +160,13 @@ $totalNominal += $row->nominal;
 $totalAdministrasi += $row->administrasi;
 $totalKoreksi += $row->koreksi;
 $totalTotal += $row->total;
+$totalEfektivitas += $row->efektivitas_persen;
+$totalEfisiensi += $row->efisiensi_persen;
+@endphp
+
+@php
+$rataEfektivitas = $jumlahBaris > 0 ? $totalEfektivitas / $jumlahBaris : 0;
+$rataEfisiensi   = $jumlahBaris > 0 ? $totalEfisiensi / $jumlahBaris : 0;
 @endphp
 
 <tr>
@@ -169,6 +181,8 @@ $totalTotal += $row->total;
     <td class="right">{{ number_format($row->administrasi, 0, ',', '.') }}</td>
     <td class="right">{{ number_format($row->koreksi, 0, ',', '.') }}</td>
     <td class="right">{{ number_format($row->total, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($row->efektivitas_persen, 2) }}%</td>
+    <td class="right">{{ number_format($row->efisiensi_persen, 2) }}%</td>
 </tr>
 @endforeach
 
@@ -180,6 +194,8 @@ $totalTotal += $row->total;
     <td class="right">{{ number_format($totalAdministrasi, 0, ',', '.') }}</td>
     <td class="right">{{ number_format($totalKoreksi, 0, ',', '.') }}</td>
     <td class="right">{{ number_format($totalTotal, 0, ',', '.') }}</td>
+    <td class="right">{{ number_format($rataEfektivitas, 2) }}%</td>
+    <td class="right">{{ number_format($rataEfisiensi, 2) }}%</td>
 </tr>
 
 </table>
