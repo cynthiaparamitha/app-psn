@@ -27,7 +27,7 @@ class AuthController extends Controller
 
             session(['user' => $username]);
 
-            return redirect('/drd');
+            return redirect('/ikhtisartahunan');
         }
 
         return back()->with('error', 'Username atau password salah.');

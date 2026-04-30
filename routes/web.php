@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\IkhtisarTahunanController;
 use App\Http\Controllers\DrdController;
 use App\Http\Controllers\LhkController;
 use App\Http\Controllers\PasangController;
@@ -16,8 +17,10 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::get('/logout', [AuthController::class, 'logout'])->name('logout');
 
 Route::get('/', function () {
-    return redirect()->route('drd.index');
+    return redirect()->route('ikhtisar.tahunan');
 });
+
+Route::get('/ikhtisartahunan', [IkhtisarTahunanController::class, 'index'])->name('ikhtisar.tahunan');
 
 Route::get('/drd', [DrdController::class, 'index'])->name('drd.index');
 
