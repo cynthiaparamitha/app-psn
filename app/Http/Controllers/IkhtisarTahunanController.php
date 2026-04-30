@@ -25,21 +25,21 @@ class IkhtisarTahunanController extends Controller
             ->pluck('tahun');
 
         if (!$tahun) {
-            $tahun = $listTahun->last(); // ambil tahun terbaru
+            $tahun = $listTahun->last();
         }
 
         $data = DB::table('vw_drd_zona_psn')
-            ->select(
-                DB::raw("LEFT(tabul,4) AS tahun"),
-                DB::raw("RIGHT(tabul,2) AS bulan"),
-                DB::raw("SUM(nominal + administrasi) AS total")
-            )
-            ->whereRaw("LEFT(tabul,4) = ?", [$tahun])
-            ->groupBy(DB::raw("LEFT(tabul,4)"), DB::raw("RIGHT(tabul,2)"))
-            ->orderBy(DB::raw("RIGHT(tabul,2)"))
-            ->get();
+        ->select(
+            DB::raw("LEFT(tabul,4) AS tahun"),
+            DB::raw("RIGHT(tabul,2) AS bulan"),
+            DB::raw("SUM(total) AS total")
+        )
+        ->whereRaw("LEFT(tabul,4) = ?", [$tahun])
+        ->groupBy(DB::raw("LEFT(tabul,4)"), DB::raw("RIGHT(tabul,2)"))
+        ->orderBy(DB::raw("RIGHT(tabul,2)"))
+        ->get();
 
-        $kubikasiData = DB::table('vw_drd_cabang_psn')
+        $kubikasiData = DB::table('vw_drd_zona_psn')
             ->select(
                 DB::raw("RIGHT(tabul,2) AS bulan"),
                 DB::raw("SUM(kubikasi) AS total_kubik")
