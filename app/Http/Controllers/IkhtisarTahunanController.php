@@ -29,15 +29,15 @@ class IkhtisarTahunanController extends Controller
         }
 
         $data = DB::table('vw_drd_zona_psn')
-        ->select(
-            DB::raw("LEFT(tabul,4) AS tahun"),
-            DB::raw("RIGHT(tabul,2) AS bulan"),
-            DB::raw("SUM(total) AS total")
-        )
-        ->whereRaw("LEFT(tabul,4) = ?", [$tahun])
-        ->groupBy(DB::raw("LEFT(tabul,4)"), DB::raw("RIGHT(tabul,2)"))
-        ->orderBy(DB::raw("RIGHT(tabul,2)"))
-        ->get();
+            ->select(
+                DB::raw("LEFT(tabul,4) AS tahun"),
+                DB::raw("RIGHT(tabul,2) AS bulan"),
+                DB::raw("SUM(total) AS total")
+            )
+            ->whereRaw("LEFT(tabul,4) = ?", [$tahun])
+            ->groupBy(DB::raw("LEFT(tabul,4)"), DB::raw("RIGHT(tabul,2)"))
+            ->orderBy(DB::raw("RIGHT(tabul,2)"))
+            ->get();
 
         $kubikasiData = DB::table('vw_drd_zona_psn')
             ->select(
@@ -65,8 +65,37 @@ class IkhtisarTahunanController extends Controller
             $kubik[] = (int) ($kubikasiData->firstWhere('bulan', $kode)->total_kubik ?? 0);
         }
 
+        $pemakaian = DB::table('vw_pemakaian_psn')
+            ->select(
+                DB::raw("RIGHT(tabul,2) AS bulan"),
+                "jumlah_plg_k_0",
+                "jumlah_plg_k_1_5",
+                "jumlah_plg_k_6_10",
+                "jumlah_plg_k_11_20",
+                "jumlah_plg_lbh_20"
+            )
+            ->whereRaw("LEFT(tabul,4)=?", [$tahun])
+            ->orderBy(DB::raw("RIGHT(tabul,2)"))
+            ->get();
+
+        $labelsPemakaian = [];
+        $k0 = $k1_5 = $k6_10 = $k11_20 = $k20 = [];
+
+        foreach ($bulanList as $kode => $nama) {
+            $labelsPemakaian[] = $nama;
+
+            $row = $pemakaian->firstWhere('bulan', $kode);
+
+            $k0[]     = (int) ($row->jumlah_plg_k_0 ?? 0);
+            $k1_5[]   = (int) ($row->jumlah_plg_k_1_5 ?? 0);
+            $k6_10[]  = (int) ($row->jumlah_plg_k_6_10 ?? 0);
+            $k11_20[] = (int) ($row->jumlah_plg_k_11_20 ?? 0);
+            $k20[]    = (int) ($row->jumlah_plg_lbh_20 ?? 0);
+        }
+
         return view('ikhtisar_tahunan', compact(
-            'labels','values','tahun','kubik','listTahun'
+            'labels','values','tahun','kubik','listTahun',
+            'labelsPemakaian','k0','k1_5','k6_10','k11_20','k20'
         ));
     }
 }

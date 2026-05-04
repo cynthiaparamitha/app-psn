@@ -10,8 +10,8 @@
             margin: 20px;
         }
 
-        .container-drd {
-            max-width: 1200px;
+        .container-ikhtisar {
+            max-width: 1360px;
             margin: 0;
         }
 
@@ -55,12 +55,18 @@
         }
 
         .graph-col {
-            flex: 0 0 60%;
-            min-width: 600px;
+            flex: 1 1 60%;
+            min-width: 400px;
+        }
+
+        .graph-col-2 {
+            flex: 1 1 100%;
+            max-width: 100%;
+            min-width: 400px;
         }
 
         .table-col {
-            flex: 0 0 40%;
+            flex: 1 1 40%;
             min-width: 400px;
         }
 
@@ -125,7 +131,7 @@
 
 @include('layouts.navbar')
 
-<div class="container-drd">
+<div class="container-ikhtisar">
 
     <h2>Ikhtisar Tahunan</h2>
 
@@ -173,7 +179,13 @@
                 </tr>
             </table>
         </div>
-
+    </div>
+    
+    <div class="graph-table-row">
+    <div class="card graph-col-2" style="margin-top:20px;">
+        <h3>Grafik Pemakaian Pelanggan (Per Kubik) <?= $tahun ?></h3>
+        <canvas id="grafikPemakaian" height="140"></canvas>
+    </div>
     </div>
 
 </div>
@@ -197,6 +209,56 @@
         options: {
             responsive: true,
             scales: { y: { beginAtZero: true }}
+        }
+    });
+</script>
+
+<script>
+    const ctxPmk = document.getElementById('grafikPemakaian').getContext('2d');
+
+    new Chart(ctxPmk, {
+        type: 'bar',
+        data: {
+            labels: {!! json_encode($labelsPemakaian) !!},
+            datasets: [
+                {
+                    label: '0 m³',
+                    data: {!! json_encode($k0) !!},
+                    backgroundColor: 'rgba(52,152,219,0.8)'
+                },
+                {
+                    label: '1–5 m³',
+                    data: {!! json_encode($k1_5) !!},
+                    backgroundColor: 'rgba(46,204,113,0.8)'
+                },
+                {
+                    label: '6–10 m³',
+                    data: {!! json_encode($k6_10) !!},
+                    backgroundColor: 'rgba(241,196,15,0.8)'
+                },
+                {
+                    label: '11–20 m³',
+                    data: {!! json_encode($k11_20) !!},
+                    backgroundColor: 'rgba(230,126,34,0.8)'
+                },
+                {
+                    label: '>20 m³',
+                    data: {!! json_encode($k20) !!},
+                    backgroundColor: 'rgba(231,76,60,0.8)'
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            scales: { 
+                y: { 
+                    beginAtZero: true,
+                    title: {
+                        display: true,
+                        text: 'Jumlah Pelanggan'
+                    }
+                }
+            }
         }
     });
 </script>
