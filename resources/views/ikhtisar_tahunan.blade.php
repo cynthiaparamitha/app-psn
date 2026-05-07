@@ -188,6 +188,13 @@
     </div>
     </div>
 
+   <div class="graph-table-row">
+    <div class="card graph-col-2">
+        <h3>Grafik Penerimaan <?= $tahun ?></h3>
+        <canvas id="grafikPenerimaan" height="120"></canvas>
+    </div>
+</div> 
+
 </div>
 
 
@@ -256,6 +263,50 @@
                     title: {
                         display: true,
                         text: 'Jumlah Pelanggan'
+                    }
+                }
+            }
+        }
+    });
+</script>
+
+<script>
+    const ctxTerima = document.getElementById('grafikPenerimaan').getContext('2d');
+
+    new Chart(ctxTerima, {
+        type: 'line',
+        data: {
+            labels: {!! json_encode($labels) !!},
+            datasets: [{
+                label: 'Penerimaan LHK',
+                data: {!! json_encode($penerimaan) !!},
+                borderWidth: 3,
+                fill: true,
+                tension: 0.3,
+                backgroundColor: 'rgba(54, 162, 235, 0.15)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                pointBorderColor: 'rgba(54, 162, 235, 1)'
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return 'Rp ' + value.toLocaleString('id-ID');
+                        }
+                    }
+                }
+            },
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return 'Rp ' + context.raw.toLocaleString('id-ID');
+                        }
                     }
                 }
             }

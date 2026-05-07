@@ -81,6 +81,25 @@ class IkhtisarTahunanController extends Controller
         $labelsPemakaian = [];
         $k0 = $k1_5 = $k6_10 = $k11_20 = $k20 = [];
 
+        $penerimaanData = DB::table('vw_zona_lhk')
+        ->select(
+            DB::raw("RIGHT(tabul,2) AS bulan"),
+            DB::raw("
+                SUM(
+                    ISNULL(air,0) +
+                    ISNULL(administrasi,0) +
+                    ISNULL(denda,0) +
+                    ISNULL(NAL,0)
+                ) AS total_penerimaan
+            ")
+        )
+        ->whereRaw("LEFT(tabul,4)=?", [$tahun])
+        ->groupBy(DB::raw("RIGHT(tabul,2)"))
+        ->orderBy(DB::raw("RIGHT(tabul,2)"))
+        ->get();
+
+        $penerimaan = [];
+
         foreach ($bulanList as $kode => $nama) {
             $labelsPemakaian[] = $nama;
 
@@ -91,11 +110,16 @@ class IkhtisarTahunanController extends Controller
             $k6_10[]  = (int) ($row->jumlah_plg_k_6_10 ?? 0);
             $k11_20[] = (int) ($row->jumlah_plg_k_11_20 ?? 0);
             $k20[]    = (int) ($row->jumlah_plg_lbh_20 ?? 0);
+
+            $penerimaan[] = (int) (
+                $penerimaanData->firstWhere('bulan', $kode)->total_penerimaan ?? 0
+            );
         }
 
         return view('ikhtisar_tahunan', compact(
             'labels','values','tahun','kubik','listTahun',
-            'labelsPemakaian','k0','k1_5','k6_10','k11_20','k20'
+            'labelsPemakaian','k0','k1_5','k6_10','k11_20','k20',
+            'penerimaan'
         ));
     }
 }
