@@ -306,25 +306,7 @@
         },
         options: {
             responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return /*'Rp ' +*/ value.toLocaleString('id-ID');
-                        }
-                    }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return 'Penerimaan <?= $tahun ?> : ' + /*'Rp ' +*/ context.raw.toLocaleString('id-ID');
-                        }
-                    }
-                }
-            }
+            scales: { y: { beginAtZero: true }}
         }
     });
 </script>
