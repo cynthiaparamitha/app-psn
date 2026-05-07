@@ -278,7 +278,7 @@
         data: {
             labels: {!! json_encode($labels) !!},
             datasets: [{
-                label: 'Penerimaan LHK',
+                label: 'Penerimaan <?= $tahun ?>',
                 data: {!! json_encode($penerimaan) !!},
                 borderWidth: 3,
                 fill: true,
@@ -296,7 +296,7 @@
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return 'Rp ' + value.toLocaleString('id-ID');
+                            return /*'Rp ' +*/ value.toLocaleString('id-ID');
                         }
                     }
                 }
@@ -305,7 +305,7 @@
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Rp ' + context.raw.toLocaleString('id-ID');
+                            return 'Penerimaan <?= $tahun ?> : ' + /*'Rp ' +*/ context.raw.toLocaleString('id-ID');
                         }
                     }
                 }
