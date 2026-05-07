@@ -65,6 +65,11 @@
             min-width: 400px;
         }
 
+        .graph-col-3 {
+            flex: 1 1 50%;
+            min-width: 400px;
+        }
+
         .table-col {
             flex: 1 1 40%;
             min-width: 400px;
@@ -111,6 +116,7 @@
             }
 
             .graph-col,
+            .graph-col-3,
             .table-col {
                 flex: 100%;
                 max-width: 100%;
@@ -121,7 +127,7 @@
             .graph-table-row {
                 flex-direction: column;
             }
-            .graph-col, .table-col {
+            .graph-col, .graph-col-3, .table-col {
                 flex: 100%;
             }
         }
@@ -152,7 +158,7 @@
 
         <div class="card graph-col">
             <h3>DRD <?= $tahun ?></h3>
-            <canvas id="grafikTahunan" height="150"></canvas>
+            <canvas id="grafikDrd" height="150"></canvas>
         </div>
 
         <div class="card table-col">
@@ -182,26 +188,37 @@
     </div>
     
     <div class="graph-table-row">
-    <div class="card graph-col-2" style="margin-top:20px;">
-        <h3>Grafik Pemakaian Pelanggan (Per Kubik) <?= $tahun ?></h3>
-        <canvas id="grafikPemakaian" height="140"></canvas>
-    </div>
+        <div class="card graph-col-2" style="margin-top:20px;">
+            <h3>Grafik Pemakaian Pelanggan (Per Kubik) <?= $tahun ?></h3>
+            <canvas id="grafikPemakaian" height="140"></canvas>
+        </div>
     </div>
 
    <div class="graph-table-row">
-    <div class="card graph-col-2">
-        <h3>Grafik Penerimaan <?= $tahun ?></h3>
-        <canvas id="grafikPenerimaan" height="120"></canvas>
+        <div class="card graph-col-2">
+            <h3>Grafik Penerimaan <?= $tahun ?></h3>
+            <canvas id="grafikPenerimaan" height="120"></canvas>
+        </div>
+    </div> 
+
+    <div class="graph-table-row">
+        <div class="card graph-col-3">
+            <h3>Efisiensi <?= $tahun ?></h3>
+            <canvas id="grafikEfisiensi" height="150"></canvas>
+        </div>
+        <div class="card graph-col-3">
+            <h3>Efektivitas <?= $tahun ?></h3>
+            <canvas id="grafikEfektivitas" height="150"></canvas>
+        </div>
     </div>
-</div> 
 
 </div>
 
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const ctx = document.getElementById('grafikTahunan').getContext('2d');
-    const grafikTahunan = new Chart(ctx, {
+    const ctx = document.getElementById('grafikDrd').getContext('2d');
+    const grafikDrd = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: <?= json_encode($labels) ?>,
@@ -222,7 +239,6 @@
 
 <script>
     const ctxPmk = document.getElementById('grafikPemakaian').getContext('2d');
-
     new Chart(ctxPmk, {
         type: 'bar',
         data: {
@@ -272,7 +288,6 @@
 
 <script>
     const ctxTerima = document.getElementById('grafikPenerimaan').getContext('2d');
-
     new Chart(ctxTerima, {
         type: 'line',
         data: {
@@ -308,6 +323,58 @@
                             return 'Penerimaan <?= $tahun ?> : ' + /*'Rp ' +*/ context.raw.toLocaleString('id-ID');
                         }
                     }
+                }
+            }
+        }
+    });
+</script>
+
+<script>
+    const ctxEfisiensi = document.getElementById('grafikEfisiensi').getContext('2d');
+    new Chart(ctxEfisiensi, {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: [{
+                label: 'Efisiensi <?= $tahun ?>',
+                data: <?= json_encode($efisiensi) ?>,
+                borderWidth: 2,
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
+            }
+        }
+    });
+</script>
+
+<script>
+    const ctxEfektivitas = document.getElementById('grafikEfektivitas').getContext('2d');
+    new Chart(ctxEfektivitas, {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode($labels) ?>,
+            datasets: [{
+                label: 'Efektivitas <?= $tahun ?>',
+                data: <?= json_encode($efektivitas) ?>,
+                borderWidth: 2,
+                backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
                 }
             }
         }

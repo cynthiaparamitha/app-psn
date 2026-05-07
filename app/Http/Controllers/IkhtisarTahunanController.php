@@ -100,6 +100,31 @@ class IkhtisarTahunanController extends Controller
 
         $penerimaan = [];
 
+        $efisiensiData = DB::table('vw_drd_zona_psn')
+            ->select(
+                DB::raw("LEFT(tabul,4) AS tahun"),
+                DB::raw("RIGHT(tabul,2) AS bulan"),
+                DB::raw("AVG(efisiensi_persen) AS efisiensi_persen")
+            )
+            ->whereRaw("LEFT(tabul,4) = ?", [$tahun])
+            ->groupBy(DB::raw("LEFT(tabul,4)"), DB::raw("RIGHT(tabul,2)"))
+            ->orderBy(DB::raw("RIGHT(tabul,2)"))
+            ->get();
+
+        $efektivitasData = DB::table('vw_drd_zona_psn')
+            ->select(
+                DB::raw("LEFT(tabul,4) AS tahun"),
+                DB::raw("RIGHT(tabul,2) AS bulan"),
+                DB::raw("AVG(efektivitas_persen) AS efektivitas_persen")
+            )
+            ->whereRaw("LEFT(tabul,4) = ?", [$tahun])
+            ->groupBy(DB::raw("LEFT(tabul,4)"), DB::raw("RIGHT(tabul,2)"))
+            ->orderBy(DB::raw("RIGHT(tabul,2)"))
+            ->get();
+
+        $efisiensi = [];
+        $efektivitas = [];
+
         foreach ($bulanList as $kode => $nama) {
             $labelsPemakaian[] = $nama;
 
@@ -114,12 +139,18 @@ class IkhtisarTahunanController extends Controller
             $penerimaan[] = (int) (
                 $penerimaanData->firstWhere('bulan', $kode)->total_penerimaan ?? 0
             );
+
+            $efi = $efisiensiData->firstWhere('bulan', $kode);
+            $efk = $efektivitasData->firstWhere('bulan', $kode);
+
+            $efisiensi[] = round((float)($efi->efisiensi_persen ?? 0), 2);
+            $efektivitas[] = round((float)($efk->efektivitas_persen ?? 0), 2);
         }
 
         return view('ikhtisar_tahunan', compact(
             'labels','values','tahun','kubik','listTahun',
             'labelsPemakaian','k0','k1_5','k6_10','k11_20','k20',
-            'penerimaan'
+            'penerimaan', 'efisiensi', 'efektivitas'
         ));
     }
 }
