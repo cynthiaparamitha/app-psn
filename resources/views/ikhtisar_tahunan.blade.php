@@ -287,17 +287,33 @@
 </script>
 
 <script>
+    const rawLabels = {!! json_encode($labels) !!};
+    const rawData   = {!! json_encode($penerimaan) !!};
+
+    let lastIndex = -1;
+
+    rawData.forEach((val, i) => {
+        if (val !== null && val !== 0 && val !== '0') {
+            lastIndex = i;
+        }
+    });
+
+    const labelsTerima = rawLabels.slice(0, lastIndex + 1);
+    const dataTerima   = rawData.slice(0, lastIndex + 1);
+
     const ctxTerima = document.getElementById('grafikPenerimaan').getContext('2d');
+
     new Chart(ctxTerima, {
         type: 'line',
         data: {
-            labels: {!! json_encode($labels) !!},
+            labels: labelsTerima,
             datasets: [{
                 label: 'Penerimaan <?= $tahun ?>',
-                data: {!! json_encode($penerimaan) !!},
+                data: dataTerima,
                 borderWidth: 3,
                 fill: true,
                 tension: 0.3,
+
                 backgroundColor: 'rgba(54, 162, 235, 0.15)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 pointBackgroundColor: 'rgba(54, 162, 235, 1)',
@@ -311,7 +327,7 @@
                     beginAtZero: true,
                     ticks: {
                         callback: function(value) {
-                            return /*'Rp ' +*/ value.toLocaleString('id-ID');
+                            return value.toLocaleString('id-ID');
                         }
                     }
                 }
@@ -320,7 +336,8 @@
                 tooltip: {
                     callbacks: {
                         label: function(context) {
-                            return 'Penerimaan <?= $tahun ?> : ' + /*'Rp ' +*/ context.raw.toLocaleString('id-ID');
+                            return 'Penerimaan <?= $tahun ?> : ' 
+                                + context.raw.toLocaleString('id-ID');
                         }
                     }
                 }
