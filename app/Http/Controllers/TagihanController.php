@@ -40,9 +40,16 @@ class TagihanController extends Controller
                 tunggakan_bulan,
                 tunggakan_tagihan
             FROM dbo.psn_tagihan
+            ORDER BY nopel ASC
         ");
 
-        $data = collect($raw);
+        $allData = collect($raw);
+
+        $zonaList   = $allData->pluck('zona')->filter()->unique()->sort()->values();
+        $cabangList = $allData->pluck('cabang')->filter()->unique()->sort()->values();
+        $statusList = $allData->pluck('status')->filter()->unique()->sort()->values();
+
+        $data = $allData;
 
         if ($search) {
             $s = strtolower($search);
@@ -62,41 +69,63 @@ class TagihanController extends Controller
         $sort = $request->sort ?? 'default';
 
         switch ($sort) {
-            case 'nopel_asc':  $data = $data->sortBy('nopel'); break;
-            case 'nopel_desc': $data = $data->sortByDesc('nopel'); break;
+            case 'nopel_asc':  
+                $data = $data->sortBy('nopel', SORT_NATURAL); 
+                break;
+            case 'nopel_desc': 
+                $data = $data->sortByDesc('nopel', SORT_NATURAL); 
+                break;
 
-            case 'drd_asc':    $data = $data->sortBy('drd_bulan'); break;
-            case 'drd_desc':   $data = $data->sortByDesc('drd_bulan'); break;
+            case 'drd_asc':    
+                $data = $data->sortBy(['drd_bulan', 'nopel']); 
+                break;
+            case 'drd_desc':   
+                $data = $data->sortBy([
+                    ['drd_bulan', 'desc'],
+                    ['nopel', 'asc']
+                ]); 
+                break;
 
-            case 'bayar_asc':  $data = $data->sortBy('pembayaran_bulan'); break;
-            case 'bayar_desc': $data = $data->sortByDesc('pembayaran_bulan'); break;
+            case 'bayar_asc':  
+                $data = $data->sortBy(['pembayaran_bulan', 'nopel']); 
+                break;
+            case 'bayar_desc': 
+                $data = $data->sortBy([
+                    ['pembayaran_bulan', 'desc'],
+                    ['nopel', 'asc']
+                ]); 
+                break;
 
-            case 'tunggak_asc':  $data = $data->sortBy('tunggakan_bulan'); break;
-            case 'tunggak_desc': $data = $data->sortByDesc('tunggakan_bulan'); break;
+            case 'tunggak_asc':  
+                $data = $data->sortBy(['tunggakan_bulan', 'nopel']); 
+                break;
+            case 'tunggak_desc': 
+                $data = $data->sortBy([
+                    ['tunggakan_bulan', 'desc'],
+                    ['nopel', 'asc']
+                ]); 
+                break;
 
             default:
-                $data = $data->sortByDesc('drd_bulan');
+                $data = $data->sortBy([
+                    ['drd_bulan', 'desc'],
+                    ['nopel', 'asc']
+                ]);
         }
 
         $data = $data->values();
 
         $fullTotal = [
-            'bulan_drd'   => $data->sum('drd_bulan'),
-            'nom_drd'     => $data->sum('drd_tagihan'),
-
-            'bulan_bayar' => $data->sum('pembayaran_bulan'),
-            'nom_bayar'   => $data->sum('pembayaran_tagihan'),
-
+            'bulan_drd'     => $data->sum('drd_bulan'),
+            'nom_drd'       => $data->sum('drd_tagihan'),
+            'bulan_bayar'   => $data->sum('pembayaran_bulan'),
+            'nom_bayar'     => $data->sum('pembayaran_tagihan'),
             'bulan_tunggak' => $data->sum('tunggakan_bulan'),
             'nom_tunggak'   => $data->sum('tunggakan_tagihan'),
         ];
 
-        $zonaList   = $data->pluck('zona')->unique()->sort()->values();
-        $cabangList = $data->pluck('cabang')->unique()->sort()->values();
-        $statusList = $data->pluck('status')->unique()->sort()->values();
-
         if ($perPage !== 'all') {
-            $current = $request->page ?? 1;
+            $current = LengthAwarePaginator::resolveCurrentPage();
             $offset  = ($current - 1) * $perPage;
 
             $paged = $data->slice($offset, $perPage)->values();

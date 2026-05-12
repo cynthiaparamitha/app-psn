@@ -1,137 +1,188 @@
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Ikhtisar Tahunan</title>
 
-    <style>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        margin: 0;
+        padding: 10px;
+    }
+
+    .container-ikhtisar {
+        width: 100%;
+        max-width: 1360px;
+        margin: 0 auto;
+        padding-top: 15px;
+        box-sizing: border-box;
+    }
+
+    h2 {
+        margin-top: 10px;
+        margin-bottom: 18px;
+        color: #2c3e50;
+        font-size: 22px;
+        font-weight: bold;
+    }
+
+    h3 {
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 15px;
+        color: #34495e;
+    }
+
+    .filter-box {
+        background: #ffffff;
+        padding: 12px 15px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        margin-bottom: 20px;
+        width: 100%;
+        box-sizing: border-box;
+    }
+
+    .filter-box form {
+        display: flex;
+        align-items: center;
+    }
+
+    select {
+        padding: 8px 12px;
+        margin-left: 8px;
+        border: 1px solid #bbb;
+        border-radius: 5px;
+        font-size: 14px;
+        background: #fff;
+    }
+
+    .graph-table-row {
+        display: flex;
+        flex-direction: column; 
+        gap: 20px;
+        width: 100%;
+        margin-bottom: 20px;
+        box-sizing: border-box;
+    }
+
+    .card {
+        background: white;
+        border-radius: 12px;
+        padding: 15px;
+        box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+        box-sizing: border-box;
+        width: 100%; 
+    }
+
+    .chart-container {
+        position: relative;
+        width: 100%;
+        height: 260px; 
+    }
+
+    .chart-container-large {
+        height: 300px;
+    }
+
+    .table-responsive {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        border-radius: 6px;
+        overflow: hidden;
+        border: 1px solid #ddd;
+    }
+
+    table th {
+        background: #34495e;
+        color: white;
+        padding: 10px 8px;
+        font-size: 13px;
+        font-weight: bold;
+        border: 1px solid #ddd;
+        text-align: center;
+    }
+
+    table td {
+        padding: 10px 8px;
+        border: 1px solid #ddd;
+        font-size: 13px;
+    }
+
+    table tr:nth-child(even) {
+        background: #fafafa;
+    }
+
+    table tr:hover {
+        background: #eef5ff;
+    }
+
+    .right { text-align: right; }
+
+    @media (min-width: 768px) {
         body {
-            font-family: Arial, sans-serif;
-            background: #f4f6f9;
-            margin: 20px;
-        }
-
-        .container-ikhtisar {
-            max-width: 1360px;
-            margin: 0;
-        }
-
-        h2 {
-            margin-bottom: 18px;
-            color: #2c3e50;
-            font-size: 26px;
-            font-weight: bold;
-        }
-
-        .filter-box {
-            background: #ffffff;
-            padding: 12px 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
-            display: inline-block;
-        }
-
-        select {
-            padding: 7px 10px;
-            margin-left: 8px;
-            border: 1px solid #bbb;
-            border-radius: 5px;
-            font-size: 14px;
-            background: #fff;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
             padding: 20px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
+        }
+        
+        h2 {
+            font-size: 24px;
+        }
+        
+        .filter-box {
+            width: fit-content;
         }
 
+        .chart-container {
+            height: 320px;
+        }
+    }
+
+    @media (min-width: 1024px) {
         .graph-table-row {
-            display: flex;
-            gap: 20px;
-            width: 100%;
+            flex-direction: row;
+            flex-wrap: nowrap;
+            align-items: stretch;
         }
 
         .graph-col {
-            flex: 1 1 60%;
-            min-width: 400px;
-        }
-
-        .graph-col-2 {
-            flex: 1 1 100%;
-            max-width: 100%;
-            min-width: 400px;
-        }
-
-        .graph-col-3 {
-            flex: 1 1 50%;
-            min-width: 400px;
+            flex: 0 0 60%;
+            width: 60%;
         }
 
         .table-col {
-            flex: 1 1 40%;
-            min-width: 400px;
+            flex: 0 0 40%;
+            width: 40%;
         }
 
-        table {
+        .graph-col-2 {
+            flex: 0 0 100%;
             width: 100%;
-            border-collapse: collapse;
-            background: white;
-            border-radius: 6px;
-            overflow: hidden;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.06);
         }
 
-        table th {
-            background: #34495e;
-            color: white;
-            padding: 10px 8px;
-            font-size: 14px;
-            font-weight: bold;
-            border: 1px solid #ddd;
-            text-align: center;
+        .graph-col-3 {
+            flex: 0 0 calc(50% - 10px);
+            width: calc(50% - 10px);
         }
 
-        table td {
-            padding: 9px 8px;
-            border: 1px solid #ddd;
-            font-size: 14px;
+        .chart-container {
+            height: 350px;
         }
-
-        table tr:nth-child(even) {
-            background: #fafafa;
+        
+        .chart-container-large {
+            height: 380px;
         }
-
-        table tr:hover {
-            background: #eef5ff;
-        }
-
-        .right { text-align: right; }
-
-        @media (max-width: 1360px) {
-            .graph-table-row {
-                flex-direction: column;
-            }
-
-            .graph-col,
-            .graph-col-3,
-            .table-col {
-                flex: 100%;
-                max-width: 100%;
-            }
-        }
-
-        @media(max-width: 900px) {
-            .graph-table-row {
-                flex-direction: column;
-            }
-            .graph-col, .graph-col-3, .table-col {
-                flex: 100%;
-            }
-        }
-    </style>
+    }
+</style>
 </head>
 <body>
 
@@ -155,70 +206,87 @@
     </div>
 
     <div class="graph-table-row">
-
         <div class="card graph-col">
             <h3>DRD <?= $tahun ?></h3>
-            <canvas id="grafikDrd" height="150"></canvas>
+            <div class="chart-container">
+                <canvas id="grafikDrd"></canvas>
+            </div>
         </div>
 
         <div class="card table-col">
             <h3>Air Terjual <?= $tahun ?></h3>
-
-            <table>
-                <tr>
-                    <th>Bulan</th>
-                    <th>Kubikasi (m³)</th>
-                </tr>
-
-                <?php foreach($labels as $i => $bulan): ?>
-                <tr>
-                    <td><?= $bulan ?></td>
-                    <td class="right"><?= number_format($kubik[$i] ?? 0, 0, ',', '.') ?></td>
-                </tr>
-                <?php endforeach; ?>
-
-                <tr style="background:#27ae60;color:white;font-weight:bold;">
-                    <td>Total</td>
-                    <td class="right">
-                        <?= number_format(array_sum($kubik), 0, ',', '.') ?>
-                    </td>
-                </tr>
-            </table>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Bulan</th>
+                            <th>Kubikasi (m³)</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <?php foreach($labels as $i => $bulan): ?>
+                        <tr>
+                            <td><?= $bulan ?></td>
+                            <td class="right"><?= number_format($kubik[$i] ?? 0, 0, ',', '.') ?></td>
+                        </tr>
+                        <?php endforeach; ?>
+                        <tr style="background:#27ae60;color:white;font-weight:bold;">
+                            <td>Total</td>
+                            <td class="right">
+                                <?= number_format(array_sum($kubik), 0, ',', '.') ?>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
     
     <div class="graph-table-row">
-        <div class="card graph-col-2" style="margin-top:20px;">
+        <div class="card graph-col-2">
             <h3>Grafik Pemakaian Pelanggan (Per Kubik) <?= $tahun ?></h3>
-            <canvas id="grafikPemakaian" height="140"></canvas>
+            <div class="chart-container chart-container-large">
+                <canvas id="grafikPemakaian"></canvas>
+            </div>
         </div>
     </div>
 
-   <div class="graph-table-row">
+    <div class="graph-table-row">
         <div class="card graph-col-2">
             <h3>Grafik Penerimaan <?= $tahun ?></h3>
-            <canvas id="grafikPenerimaan" height="120"></canvas>
+            <div class="chart-container">
+                <canvas id="grafikPenerimaan"></canvas>
+            </div>
         </div>
     </div> 
 
     <div class="graph-table-row">
         <div class="card graph-col-3">
             <h3>Efisiensi <?= $tahun ?></h3>
-            <canvas id="grafikEfisiensi" height="150"></canvas>
+            <div class="chart-container">
+                <canvas id="grafikEfisiensi"></canvas>
+            </div>
         </div>
         <div class="card graph-col-3">
             <h3>Efektivitas <?= $tahun ?></h3>
-            <canvas id="grafikEfektivitas" height="150"></canvas>
+            <div class="chart-container">
+                <canvas id="grafikEfektivitas"></canvas>
+            </div>
         </div>
     </div>
 
 </div>
 
-
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
+    const standardOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: { y: { beginAtZero: true }}
+    };
+
     const ctx = document.getElementById('grafikDrd').getContext('2d');
-    const grafikDrd = new Chart(ctx, {
+    new Chart(ctx, {
         type: 'bar',
         data: {
             labels: <?= json_encode($labels) ?>,
@@ -230,10 +298,7 @@
                 borderColor: 'rgba(54, 162, 235, 1)',
             }]
         },
-        options: {
-            responsive: true,
-            scales: { y: { beginAtZero: true }}
-        }
+        options: standardOptions
     });
 </script>
 
@@ -244,42 +309,20 @@
         data: {
             labels: {!! json_encode($labelsPemakaian) !!},
             datasets: [
-                {
-                    label: '0 m³',
-                    data: {!! json_encode($k0) !!},
-                    backgroundColor: 'rgba(52,152,219,0.8)'
-                },
-                {
-                    label: '1–5 m³',
-                    data: {!! json_encode($k1_5) !!},
-                    backgroundColor: 'rgba(46,204,113,0.8)'
-                },
-                {
-                    label: '6–10 m³',
-                    data: {!! json_encode($k6_10) !!},
-                    backgroundColor: 'rgba(241,196,15,0.8)'
-                },
-                {
-                    label: '11–20 m³',
-                    data: {!! json_encode($k11_20) !!},
-                    backgroundColor: 'rgba(230,126,34,0.8)'
-                },
-                {
-                    label: '>20 m³',
-                    data: {!! json_encode($k20) !!},
-                    backgroundColor: 'rgba(231,76,60,0.8)'
-                }
+                { label: '0 m³', data: {!! json_encode($k0) !!}, backgroundColor: 'rgba(52,152,219,0.8)' },
+                { label: '1–5 m³', data: {!! json_encode($k1_5) !!}, backgroundColor: 'rgba(46,204,113,0.8)' },
+                { label: '6–10 m³', data: {!! json_encode($k6_10) !!}, backgroundColor: 'rgba(241,196,15,0.8)' },
+                { label: '11–20 m³', data: {!! json_encode($k11_20) !!}, backgroundColor: 'rgba(230,126,34,0.8)' },
+                { label: '>20 m³', data: {!! json_encode($k20) !!}, backgroundColor: 'rgba(231,76,60,0.8)' }
             ]
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: { 
                 y: { 
                     beginAtZero: true,
-                    title: {
-                        display: true,
-                        text: 'Jumlah Pelanggan'
-                    }
+                    title: { display: true, text: 'Jumlah Pelanggan' }
                 }
             }
         }
@@ -289,20 +332,13 @@
 <script>
     const rawLabels = {!! json_encode($labels) !!};
     const rawData   = {!! json_encode($penerimaan) !!};
-
     let lastIndex = -1;
-
-    rawData.forEach((val, i) => {
-        if (val !== null && val !== 0 && val !== '0') {
-            lastIndex = i;
-        }
-    });
+    rawData.forEach((val, i) => { if (val !== null && val !== 0 && val !== '0') { lastIndex = i; } });
 
     const labelsTerima = rawLabels.slice(0, lastIndex + 1);
     const dataTerima   = rawData.slice(0, lastIndex + 1);
 
     const ctxTerima = document.getElementById('grafikPenerimaan').getContext('2d');
-
     new Chart(ctxTerima, {
         type: 'line',
         data: {
@@ -313,7 +349,6 @@
                 borderWidth: 3,
                 fill: true,
                 tension: 0.3,
-
                 backgroundColor: 'rgba(54, 162, 235, 0.15)',
                 borderColor: 'rgba(54, 162, 235, 1)',
                 pointBackgroundColor: 'rgba(54, 162, 235, 1)',
@@ -322,23 +357,17 @@
         },
         options: {
             responsive: true,
+            maintainAspectRatio: false,
             scales: {
                 y: {
                     beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return value.toLocaleString('id-ID');
-                        }
-                    }
+                    ticks: { callback: function(value) { return value.toLocaleString('id-ID'); } }
                 }
             },
             plugins: {
                 tooltip: {
                     callbacks: {
-                        label: function(context) {
-                            return 'Penerimaan <?= $tahun ?> : ' 
-                                + context.raw.toLocaleString('id-ID');
-                        }
+                        label: function(context) { return 'Penerimaan <?= $tahun ?> : ' + context.raw.toLocaleString('id-ID'); }
                     }
                 }
             }
@@ -360,15 +389,7 @@
                 borderColor: 'rgba(54, 162, 235, 1)',
             }]
         },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
     });
 </script>
 
@@ -386,15 +407,7 @@
                 borderColor: 'rgba(54, 162, 235, 1)',
             }]
         },
-        options: {
-            responsive: true,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    max: 100
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
     });
 </script>
 
