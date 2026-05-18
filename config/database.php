@@ -100,23 +100,16 @@ return [
 
         'sqlsrv' => [
             'driver' => 'sqlsrv',
-            'url' => env('DB_URL'),
             'host' => env('DB_HOST', 'localhost'),
             'port' => env('DB_PORT', '1433'),
-            'database' => env('DB_DATABASE', 'laravel'),
-            'username' => env('DB_USERNAME', 'root'),
+            'database' => env('DB_DATABASE', 'forge'),
+            'username' => env('DB_USERNAME', 'forge'),
             'password' => env('DB_PASSWORD', ''),
-            'charset' => env('DB_CHARSET', 'utf8'),
+            'charset' => 'utf8',
             'prefix' => '',
             'prefix_indexes' => true,
-            'encrypt' => env('DB_ENCRYPT', 'yes'),
-            'trust_server_certificate' => env('DB_TRUST_SERVER_CERTIFICATE', 'true'),
-            'options' => [
-                PDO::ATTR_ORACLE_NULLS => PDO::NULL_NATURAL,
-                PDO::SQLSRV_ATTR_ENCODING => PDO::SQLSRV_ENCODING_UTF8,
-                'TrustServerCertificate' => env('DB_TRUST_SERVER_CERTIFICATE', true),
-                'Encrypt' => env('DB_ENCRYPT', 'yes'),
-            ],
+            'encrypt' => 'no', 
+            'trust_server_certificate' => true,
         ],
 
     ],
