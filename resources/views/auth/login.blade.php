@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Perumda Tirta Patriot</title>
+    
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
     <style>
         * {
@@ -11,8 +13,8 @@
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #1f2d3d, #34495e);
             height: 100vh;
             margin: 0;
             display: flex;
@@ -22,136 +24,125 @@
         }
 
         .login-card {
-            background: rgba(255, 255, 255, 0.95);
-            padding: 40px 35px;
+            background: #ffffff;
+            padding: 35px 30px;
             width: 100%;
             max-width: 400px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            backdrop-filter: blur(10px);
-            animation: fadeInUp 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            animation: fadeInUp 0.4s ease-out both;
         }
 
         @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(30px); }
+            from { opacity: 0; transform: translateY(20px); }
             to   { opacity: 1; transform: translateY(0); }
+        }
+
+        .logo-container {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .logo-container img {
+            max-height: 85px;
+            width: auto;
+            object-fit: contain;
         }
 
         h2 {
             margin-top: 0;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-align: center;
-            color: #1a252f;
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: -0.5px;
+            color: #2c3e50;
+            font-size: 22px;
+            font-weight: bold;
         }
 
         .subtitle {
             text-align: center;
             color: #7f8c8d;
-            font-size: 14px;
+            font-size: 13.5px;
             margin-bottom: 25px;
         }
 
         .error {
             background: #fdf2f2;
             padding: 12px 15px;
-            border-left: 4px solid #f05252;
-            color: #c81e1e;
+            border-left: 4px solid #c0392b;
+            color: #c0392b;
             margin-bottom: 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            display: flex;
-            align-items: center;
-            font-weight: 500;
+            border-radius: 4px;
+            font-size: 13px;
+            font-weight: bold;
         }
 
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 18px;
         }
 
         label {
             display: block;
             font-size: 13px;
-            color: #4b5563;
-            font-weight: 600;
+            color: #34495e;
+            font-weight: bold;
             margin-bottom: 6px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
         }
 
         input {
             width: 100%;
-            padding: 12px 16px;
-            border: 1.5px solid #e5e7eb;
-            border-radius: 8px;
-            font-size: 15px;
-            color: #1f2937;
-            background-color: #f9fafb;
+            padding: 10px 14px;
+            border: 1px solid #bbb;
+            border-radius: 5px;
+            font-size: 14px;
+            color: #2c3e50;
+            background-color: #fff;
             transition: all 0.2s ease;
+            box-sizing: border-box;
         }
 
         input:focus {
-            border-color: #3b82f6;
-            background-color: #fff;
+            border-color: #3498db;
             outline: none;
-            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
         }
 
         button {
             width: 100%;
-            background: linear-gradient(135deg, #3b82f6, #2563eb);
-            padding: 14px;
+            background: #3498db;
+            padding: 12px;
             color: white;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
-            font-weight: 600;
+            border-radius: 5px;
+            font-size: 15px;
+            font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
-            transition: all 0.2s ease;
+            transition: background 0.2s ease;
             margin-top: 10px;
         }
 
         button:hover {
-            background: linear-gradient(135deg, #2563eb, #1d4ed8);
-            transform: translateY(-1px);
-            box-shadow: 0 6px 15px rgba(37, 99, 235, 0.3);
+            background: #2980b9;
         }
 
         button:active {
-            transform: translateY(1px);
-            box-shadow: 0 2px 6px rgba(37, 99, 235, 0.2);
-        }
-
-        .form-footer {
-            margin-top: 25px;
-            text-align: center;
-            font-size: 13px;
-            color: #6b7280;
-        }
-
-        .form-footer a {
-            color: #3b82f6;
-            text-decoration: none;
-            font-weight: 500;
-        }
-
-        .form-footer a:hover {
-            text-decoration: underline;
+            background: #2471a3;
         }
     </style>
 </head>
 <body>
 
 <div class="login-card">
+
+    <div class="logo-container">
+        <img src="{{ asset('images/logo.png') }}" alt="Logo Perumda Tirta Patriot">
+    </div>
+
     <h2>Selamat Datang</h2>
     <div class="subtitle">Login untuk mengakses aplikasi PSN</div>
 
     @if(session('error'))
         <div class="error">
-            <span>{{ session('error') }}</span>
+            <span>⚠️ {{ session('error') }}</span>
         </div>
     @endif
 
@@ -160,20 +151,16 @@
 
         <div class="form-group">
             <label>Username</label>
-            <input type="text" name="username" placeholder="Masukkan username Anda" required>
+            <input type="text" name="username" placeholder="Masukkan username Anda" autocomplete="username" required>
         </div>
 
         <div class="form-group">
             <label>Password</label>
-            <input type="password" name="password" placeholder="••••••••" required>
+            <input type="password" name="password" placeholder="••••••••" autocomplete="current-password" required>
         </div>
 
         <button type="submit">Masuk ke Aplikasi</button>
     </form>
-
-    <!-- <div class="form-footer">
-        Lupa password? <a href="#">Hubungi Admin</a>
-    </div> -->
 </div>
 
 </body>

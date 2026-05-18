@@ -17,6 +17,16 @@ class PelangganController extends Controller
 
     public function index(Request $request)
     {
+        $tarifList  = DB::table('vw_pelanggan_psn')->whereNotNull('kode_tarif')->distinct()->pluck('kode_tarif');
+        $cabangList = DB::table('vw_pelanggan_psn')->whereNotNull('cabang')->distinct()->pluck('cabang');
+        $zonaList   = DB::table('vw_pelanggan_psn')->whereNotNull('zona')->distinct()->pluck('zona');
+        $statusList = DB::table('vw_pelanggan_psn')->whereNotNull('status')->distinct()->pluck('status');
+
+        return view('pelanggan.index', compact('tarifList', 'cabangList', 'statusList', 'zonaList'));
+    }
+
+    public function getDataApi(Request $request)
+    {
         $search = $request->search;
         $tarif  = $request->tarif;
         $cabang = $request->cabang;
@@ -25,7 +35,6 @@ class PelangganController extends Controller
 
         $perPage = $request->perPage ?? 10;
         $allowedPerPage = [10, 25, 50, 100, 'all'];
-
         if (!in_array($perPage, $allowedPerPage)) {
             $perPage = 10;
         }
@@ -33,19 +42,16 @@ class PelangganController extends Controller
         $allowedSort = ['nopel', 'nama'];
         $sort  = $request->sort ?? 'nopel';
         $order = $request->order ?? 'asc';
-
         if (!in_array($sort, $allowedSort)) {
             $sort = 'nopel';
         }
-
-        $nextOrder = ($order === 'asc') ? 'desc' : 'asc';
 
         $query = DB::table('vw_pelanggan_psn');
 
         if ($search) {
             $query->where(function ($q) use ($search) {
                 $q->where('nopel', 'like', "%$search%")
-                ->orWhere('nama', 'like', "%$search%");
+                  ->orWhere('nama', 'like', "%$search%");
             });
         }
 
@@ -58,31 +64,39 @@ class PelangganController extends Controller
 
         if ($perPage === 'all') {
             $data = $query->get();
+            return response()->json([
+                'is_all' => true,
+                'data' => $data,
+                'total' => $data->count()
+            ]);
         } else {
-            $data = $query->paginate($perPage)->withQueryString();
+            $data = $query->paginate($perPage);
+            return response()->json([
+                'is_all' => false,
+                'data' => $data->items(),
+                'current_page' => $data->currentPage(),
+                'from' => $data->firstItem(),
+                'to' => $data->lastItem(),
+                'total' => $data->total(),
+                'last_page' => $data->lastPage(),
+                'links' => $data->linkCollection() // Membantu merender pagination manual
+            ]);
         }
-
-        $tarifList  = DB::table('vw_pelanggan_psn')->select('kode_tarif')->distinct()->pluck('kode_tarif');
-        $cabangList = DB::table('vw_pelanggan_psn')->select('cabang')->distinct()->pluck('cabang');
-        $zonaList   = DB::table('vw_pelanggan_psn')->select('zona')->distinct()->pluck('zona');
-        $statusList = DB::table('vw_pelanggan_psn')->select('status')->distinct()->pluck('status');
-
-        return view('pelanggan.index', compact(
-            'data', 'search', 'tarif', 'cabang', 'status', 'zona',
-            'sort', 'order', 'nextOrder',
-            'tarifList', 'cabangList', 'statusList', 'zonaList',
-            'perPage'
-        ));
     }
 
     public function rekap(Request $request)
+    {
+        return view('pelanggan.rekap');
+    }
+
+    public function getRekapDataApi(Request $request)
     {
         $query = DB::table('vw_pelanggan_psn');
 
         if ($request->search) {
             $query->where(function ($q) use ($request) {
                 $q->where('nopel', 'like', "%{$request->search}%")
-                ->orWhere('nama', 'like', "%{$request->search}%");
+                  ->orWhere('nama', 'like', "%{$request->search}%");
             });
         }
 
@@ -93,7 +107,7 @@ class PelangganController extends Controller
 
         $data = $query->get();
 
-        return view('pelanggan.rekap', [
+        return response()->json([
             'rekapTarif'  => $data->groupBy('kode_tarif')->map->count(),
             'rekapCabang' => $data->groupBy('cabang')->map->count(),
             'rekapZona'   => $data->groupBy('zona')->map->count(),

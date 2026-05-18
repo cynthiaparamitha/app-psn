@@ -131,22 +131,18 @@
 
     .right { text-align: right; }
 
-    @media (min-width: 768px) {
-        body {
-            padding: 20px;
-        }
-        
-        h2 {
-            font-size: 24px;
-        }
-        
-        .filter-box {
-            width: fit-content;
-        }
+    .loading-placeholder {
+        text-align: center;
+        padding: 20px;
+        font-style: italic;
+        color: #7f8c8d;
+    }
 
-        .chart-container {
-            height: 320px;
-        }
+    @media (min-width: 768px) {
+        body { padding: 20px; }
+        h2 { font-size: 24px; }
+        .filter-box { width: fit-content; }
+        .chart-container { height: 320px; }
     }
 
     @media (min-width: 1024px) {
@@ -155,34 +151,12 @@
             flex-wrap: nowrap;
             align-items: stretch;
         }
-
-        .graph-col {
-            flex: 0 0 60%;
-            width: 60%;
-        }
-
-        .table-col {
-            flex: 0 0 40%;
-            width: 40%;
-        }
-
-        .graph-col-2 {
-            flex: 0 0 100%;
-            width: 100%;
-        }
-
-        .graph-col-3 {
-            flex: 0 0 calc(50% - 10px);
-            width: calc(50% - 10px);
-        }
-
-        .chart-container {
-            height: 350px;
-        }
-        
-        .chart-container-large {
-            height: 380px;
-        }
+        .graph-col { flex: 0 0 60%; width: 60%; }
+        .table-col { flex: 0 0 40%; width: 40%; }
+        .graph-col-2 { flex: 0 0 100%; width: 100%; }
+        .graph-col-3 { flex: 0 0 calc(50% - 10px); width: calc(50% - 10px); }
+        .chart-container { height: 350px; }
+        .chart-container-large { height: 380px; }
     }
 </style>
 </head>
@@ -195,9 +169,9 @@
     <h2>Ikhtisar Tahunan</h2>
 
     <div class="filter-box">
-        <form method="GET">
+        <form method="GET" onsubmit="event.preventDefault();">
             <label><b>Tahun:</b></label>
-            <select name="tahun" onchange="this.form.submit()">
+            <select name="tahun" id="selectTahun" onchange="fetchDataTahunan(this.value)">
                 @foreach($listTahun as $t)
                     <option value="{{ $t }}" {{ $tahun == $t ? 'selected' : '' }}>
                         {{ $t }}
@@ -209,14 +183,14 @@
 
     <div class="graph-table-row">
         <div class="card graph-col">
-            <h3>DRD <?= $tahun ?></h3>
+            <h3 id="labelTitleDrd">DRD ...</h3>
             <div class="chart-container">
                 <canvas id="grafikDrd"></canvas>
             </div>
         </div>
 
         <div class="card table-col">
-            <h3>Air Terjual <?= $tahun ?></h3>
+            <h3 id="labelTitleAir">Air Terjual ...</h3>
             <div class="table-responsive">
                 <table>
                     <thead>
@@ -225,18 +199,9 @@
                             <th>Kubikasi (m³)</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <?php foreach($labels as $i => $bulan): ?>
+                    <tbody id="tableBodyAir">
                         <tr>
-                            <td><?= $bulan ?></td>
-                            <td class="right"><?= number_format($kubik[$i] ?? 0, 0, ',', '.') ?></td>
-                        </tr>
-                        <?php endforeach; ?>
-                        <tr style="background:#27ae60;color:white;font-weight:bold;">
-                            <td>Total</td>
-                            <td class="right">
-                                <?= number_format(array_sum($kubik), 0, ',', '.') ?>
-                            </td>
+                            <td colspan="2" class="loading-placeholder">Menunggu sinkronisasi data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -246,7 +211,7 @@
     
     <div class="graph-table-row">
         <div class="card graph-col-2">
-            <h3>Grafik Pemakaian Pelanggan (Per Kubik) <?= $tahun ?></h3>
+            <h3 id="labelTitlePemakaian">Grafik Pemakaian Pelanggan (Per Kubik) ...</h3>
             <div class="chart-container chart-container-large">
                 <canvas id="grafikPemakaian"></canvas>
             </div>
@@ -255,7 +220,7 @@
 
     <div class="graph-table-row">
         <div class="card graph-col-2">
-            <h3>Grafik Penerimaan <?= $tahun ?></h3>
+            <h3 id="labelTitlePenerimaan">Grafik Penerimaan ...</h3>
             <div class="chart-container">
                 <canvas id="grafikPenerimaan"></canvas>
             </div>
@@ -264,13 +229,13 @@
 
     <div class="graph-table-row">
         <div class="card graph-col-3">
-            <h3>Efisiensi <?= $tahun ?></h3>
+            <h3 id="labelTitleEfisiensi">Efisiensi ...</h3>
             <div class="chart-container">
                 <canvas id="grafikEfisiensi"></canvas>
             </div>
         </div>
         <div class="card graph-col-3">
-            <h3>Efektivitas <?= $tahun ?></h3>
+            <h3 id="labelTitleEfektivitas">Efektivitas ...</h3>
             <div class="chart-container">
                 <canvas id="grafikEfektivitas"></canvas>
             </div>
@@ -281,137 +246,205 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    const standardOptions = {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: { y: { beginAtZero: true }}
-    };
+    let chartDrd = null;
+    let chartPemakaian = null;
+    let chartPenerimaan = null;
+    let chartEfisiensi = null;
+    let chartEfektivitas = null;
 
-    const ctx = document.getElementById('grafikDrd').getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode($labels) ?>,
-            datasets: [{
-                label: 'DRD <?= $tahun ?>',
-                data: <?= json_encode($values) ?>,
-                borderWidth: 2,
-                backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-            }]
-        },
-        options: standardOptions
-    });
-</script>
+    function formatRibuan(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
 
-<script>
-    const ctxPmk = document.getElementById('grafikPemakaian').getContext('2d');
-    new Chart(ctxPmk, {
-        type: 'bar',
-        data: {
-            labels: {!! json_encode($labelsPemakaian) !!},
-            datasets: [
-                { label: '0 m³', data: {!! json_encode($k0) !!}, backgroundColor: 'rgba(52,152,219,0.8)' },
-                { label: '1–5 m³', data: {!! json_encode($k1_5) !!}, backgroundColor: 'rgba(46,204,113,0.8)' },
-                { label: '6–10 m³', data: {!! json_encode($k6_10) !!}, backgroundColor: 'rgba(241,196,15,0.8)' },
-                { label: '11–20 m³', data: {!! json_encode($k11_20) !!}, backgroundColor: 'rgba(230,126,34,0.8)' },
-                { label: '>20 m³', data: {!! json_encode($k20) !!}, backgroundColor: 'rgba(231,76,60,0.8)' }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: { 
-                y: { 
-                    beginAtZero: true,
-                    title: { display: true, text: 'Jumlah Pelanggan' }
+    function updateComponentTitles(tahunText) {
+        document.getElementById('labelTitleDrd').innerText = `DRD ${tahunText}`;
+        document.getElementById('labelTitleAir').innerText = `Air Terjual ${tahunText}`;
+        document.getElementById('labelTitlePemakaian').innerText = `Grafik Pemakaian Pelanggan (Per Kubik) ${tahunText}`;
+        document.getElementById('labelTitlePenerimaan').innerText = `Grafik Penerimaan ${tahunText}`;
+        document.getElementById('labelTitleEfisiensi').innerText = `Efisiensi ${tahunText}`;
+        document.getElementById('labelTitleEfektivitas').innerText = `Efektivitas ${tahunText}`;
+    }
+
+    async function fetchDataTahunan(tahun) {
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + '?tahun=' + tahun;
+        window.history.pushState({ path: newUrl, tahun: tahun }, '', newUrl);
+
+        await executeRenderData(tahun);
+    }
+
+    async function executeRenderData(tahun) {
+        updateComponentTitles(tahun + " (Memuat...)");
+        document.getElementById('tableBodyAir').innerHTML = `
+            <tr><td colspan="2" class="loading-placeholder">Memuat data...</td></tr>
+        `;
+
+        if (chartDrd) { chartDrd.destroy(); chartDrd = null; }
+        if (chartPemakaian) { chartPemakaian.destroy(); chartPemakaian = null; }
+        if (chartPenerimaan) { chartPenerimaan.destroy(); chartPenerimaan = null; }
+        if (chartEfisiensi) { chartEfisiensi.destroy(); chartEfisiensi = null; }
+        if (chartEfektivitas) { chartEfektivitas.destroy(); chartEfektivitas = null; }
+
+        try {
+            const response = await fetch(`{{ route('ikhtisar.tahunan.api') }}?tahun=${tahun}`);
+            if (!response.ok) throw new Error("Gagal mengambil data");
+            
+            const resData = await response.json();
+
+            updateComponentTitles(tahun);
+
+            let tableRowsHtml = '';
+            let totalKubikasi = 0;
+            resData.labels.forEach((bulan, index) => {
+                let kubikVal = resData.kubik[index] || 0;
+                totalKubikasi += kubikVal;
+                tableRowsHtml += `
+                    <tr>
+                        <td>${bulan}</td>
+                        <td class="right">${formatRibuan(kubikVal)}</td>
+                    </tr>
+                `;
+            });
+            tableRowsHtml += `
+                <tr style="background:#27ae60;color:white;font-weight:bold;">
+                    <td>Total</td>
+                    <td class="right">${formatRibuan(totalKubikasi)}</td>
+                </tr>
+            `;
+            document.getElementById('tableBodyAir').innerHTML = tableRowsHtml;
+
+            chartDrd = new Chart(document.getElementById('grafikDrd').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: resData.labels,
+                    datasets: [{
+                        label: 'DRD ' + tahun,
+                        data: resData.values,
+                        borderWidth: 2,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true }}}
+            });
+
+            chartPemakaian = new Chart(document.getElementById('grafikPemakaian').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: resData.labelsPemakaian,
+                    datasets: [
+                        { label: '0 m³', data: resData.k0, backgroundColor: 'rgba(52,152,219,0.8)' },
+                        { label: '1–5 m³', data: resData.k1_5, backgroundColor: 'rgba(46,204,113,0.8)' },
+                        { label: '6–10 m³', data: resData.k6_10, backgroundColor: 'rgba(241,196,15,0.8)' },
+                        { label: '11–20 m³', data: resData.k11_20, backgroundColor: 'rgba(230,126,34,0.8)' },
+                        { label: '>20 m³', data: resData.k20, backgroundColor: 'rgba(231,76,60,0.8)' }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: { y: { beginAtZero: true, title: { display: true, text: 'Jumlah Pelanggan' }}}
                 }
-            }
-        }
-    });
-</script>
+            });
 
-<script>
-    const rawLabels = {!! json_encode($labels) !!};
-    const rawData   = {!! json_encode($penerimaan) !!};
-    let lastIndex = -1;
-    rawData.forEach((val, i) => { if (val !== null && val !== 0 && val !== '0') { lastIndex = i; } });
+            let lastValidIndex = -1;
+            resData.penerimaan.forEach((val, i) => { 
+                if (val !== null && val !== 0 && val !== '0') { lastValidIndex = i; } 
+            });
+            const filteredLabels = resData.labels.slice(0, lastValidIndex + 1);
+            const filteredPenerimaan = resData.penerimaan.slice(0, lastValidIndex + 1);
 
-    const labelsTerima = rawLabels.slice(0, lastIndex + 1);
-    const dataTerima   = rawData.slice(0, lastIndex + 1);
-
-    const ctxTerima = document.getElementById('grafikPenerimaan').getContext('2d');
-    new Chart(ctxTerima, {
-        type: 'line',
-        data: {
-            labels: labelsTerima,
-            datasets: [{
-                label: 'Penerimaan <?= $tahun ?>',
-                data: dataTerima,
-                borderWidth: 3,
-                fill: true,
-                tension: 0.3,
-                backgroundColor: 'rgba(54, 162, 235, 0.15)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                pointBackgroundColor: 'rgba(54, 162, 235, 1)',
-                pointBorderColor: 'rgba(54, 162, 235, 1)'
-            }]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { callback: function(value) { return value.toLocaleString('id-ID'); } }
-                }
-            },
-            plugins: {
-                tooltip: {
-                    callbacks: {
-                        label: function(context) { return 'Penerimaan <?= $tahun ?> : ' + context.raw.toLocaleString('id-ID'); }
+            chartPenerimaan = new Chart(document.getElementById('grafikPenerimaan').getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: filteredLabels,
+                    datasets: [{
+                        label: 'Penerimaan ' + tahun,
+                        data: filteredPenerimaan,
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.3,
+                        backgroundColor: 'rgba(54, 162, 235, 0.15)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        pointBackgroundColor: 'rgba(54, 162, 235, 1)',
+                        pointBorderColor: 'rgba(54, 162, 235, 1)'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { callback: function(v) { return v.toLocaleString('id-ID'); } }
+                        }
+                    },
+                    plugins: {
+                        tooltip: {
+                            callbacks: {
+                                label: function(ctx) { return 'Penerimaan ' + tahun + ' : ' + ctx.raw.toLocaleString('id-ID'); }
+                            }
+                        }
                     }
                 }
-            }
+            });
+
+            chartEfisiensi = new Chart(document.getElementById('grafikEfisiensi').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: resData.labels,
+                    datasets: [{
+                        label: 'Efisiensi ' + tahun,
+                        data: resData.efisiensi,
+                        borderWidth: 2,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+            });
+
+            chartEfektivitas = new Chart(document.getElementById('grafikEfektivitas').getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: resData.labels,
+                    datasets: [{
+                        label: 'Efektivitas ' + tahun,
+                        data: resData.efektivitas,
+                        borderWidth: 2,
+                        backgroundColor: 'rgba(54, 162, 235, 0.8)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+            });
+
+        } catch (error) {
+            console.error("Kesalahan AJAX:", error);
+            document.getElementById('tableBodyAir').innerHTML = `
+                <tr><td colspan="2" class="loading-placeholder" style="color:red;">Gagal memuat data dari database. Silakan segarkan halaman.</td></tr>
+            `;
+            updateComponentTitles(tahun + " (Gagal Sinkronisasi)");
+        }
+    }
+
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.tahun) {
+            document.getElementById('selectTahun').value = event.state.tahun;
+            executeRenderData(event.state.tahun);
+        } else {
+            const awalTahun = document.getElementById('selectTahun').value;
+            executeRenderData(awalTahun);
         }
     });
-</script>
 
-<script>
-    const ctxEfisiensi = document.getElementById('grafikEfisiensi').getContext('2d');
-    new Chart(ctxEfisiensi, {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode($labels) ?>,
-            datasets: [{
-                label: 'Efisiensi <?= $tahun ?>',
-                data: <?= json_encode($efisiensi) ?>,
-                borderWidth: 2,
-                backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
+    document.addEventListener("DOMContentLoaded", function() {
+        const tahunAwal = document.getElementById('selectTahun').value;
+
+        const currentUrl = window.location.href;
+        window.history.replaceState({ path: currentUrl, tahun: tahunAwal }, '', currentUrl);
+
+        executeRenderData(tahunAwal);
     });
 </script>
-
-<script>
-    const ctxEfektivitas = document.getElementById('grafikEfektivitas').getContext('2d');
-    new Chart(ctxEfektivitas, {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode($labels) ?>,
-            datasets: [{
-                label: 'Efektivitas <?= $tahun ?>',
-                data: <?= json_encode($efektivitas) ?>,
-                borderWidth: 2,
-                backgroundColor: 'rgba(54, 162, 235, 0.8)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, max: 100 } } }
-    });
-</script>
-
 </body>
 </html>

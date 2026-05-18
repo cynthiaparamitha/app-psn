@@ -29,12 +29,15 @@ class PasangController extends Controller
             $tabul = $listTabul->first()->tabul ?? null;
         }
 
+        return view('pasang.index', compact('listTabul', 'tabul'));
+    }
+
+    public function getDataApi(Request $request)
+    {
+        $tabul = $request->tabul;
+
         if (!$tabul) {
-            return view('pasang.index', [
-                'data'      => [],
-                'listTabul' => $listTabul,
-                'tabul'     => null,
-            ]);
+            return response()->json(['tabul' => null, 'data' => []]);
         }
 
         $data = DB::table('vw_psn_pasang')
@@ -42,6 +45,9 @@ class PasangController extends Controller
             ->orderBy('zona')
             ->get();
 
-        return view('pasang.index', compact('data', 'listTabul', 'tabul'));
+        return response()->json([
+            'tabul' => $tabul,
+            'data'  => $data
+        ]);
     }
 }

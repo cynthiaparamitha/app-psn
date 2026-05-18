@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perumda Tirta Patriot - Rekap Pelanggan PSN</title>
-
+    
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,7 +13,6 @@
             margin: 0;
             padding: 10px;
         }
-
         .container-drd {
             width: 100%;
             max-width: 1360px;
@@ -22,7 +20,6 @@
             padding-top: 15px;
             box-sizing: border-box;
         }
-
         h2 {
             margin-top: 10px;
             margin-bottom: 18px;
@@ -31,7 +28,6 @@
             font-weight: bold;
             display: inline-block;
         }
-
         .header-container {
             display: flex;
             justify-content: space-between;
@@ -40,7 +36,6 @@
             margin-bottom: 20px;
             gap: 10px;
         }
-
         .back-btn {
             display: inline-block;
             padding: 8px 18px;
@@ -53,11 +48,9 @@
             box-sizing: border-box;
             transition: background 0.2s ease;
         }
-
         .back-btn:hover {
             background: #2980b9;
         }
-
         .report-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -65,16 +58,14 @@
             width: 100%;
             box-sizing: border-box;
         }
-
         .card {
             background: white;
             border-radius: 12px;
             padding: 15px;
             box-shadow: 0 2px 10px rgba(0,0,0,0.04);
             box-sizing: border-box;
-            width: 100%; 
+            width: 100%;
         }
-
         .section-title {
             margin-bottom: 15px;
             font-size: 16px;
@@ -83,13 +74,11 @@
             padding-left: 10px;
             font-weight: bold;
         }
-
         .table-responsive {
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -98,7 +87,6 @@
             overflow: hidden;
             border: 1px solid #ddd;
         }
-
         table th {
             background: #34495e;
             color: white;
@@ -109,27 +97,22 @@
             text-align: left;
             white-space: nowrap;
         }
-
         table td {
             padding: 10px 15px;
             border: 1px solid #ddd;
             font-size: 13px;
             white-space: nowrap;
         }
-
         table tr:nth-child(even) {
             background: #fafafa;
         }
-
         table tr:hover {
             background: #eef5ff;
         }
-
         .total-row {
             font-weight: bold;
             background: #eaeded !important;
         }
-
         .total-box {
             font-size: 32px;
             font-weight: bold;
@@ -142,29 +125,23 @@
             body {
                 padding: 20px;
             }
-            
             h2 {
                 font-size: 24px;
             }
-
             .report-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
-
             .total-card-col {
                 grid-column: span 2;
             }
         }
-
         @media (min-width: 1024px) {
             .container-drd {
                 padding-top: 10px;
             }
-
             h2 {
                 font-size: 26px;
             }
-
             .card {
                 padding: 20px;
             }
@@ -176,14 +153,12 @@
 @include('layouts.navbar')
 
 <div class="container-drd">
-
     <div class="header-container">
         <h2>📊 Rekapan Pelanggan</h2>
-        <a href="{{ url()->previous() }}" class="back-btn">← Kembali</a>
+        <a href="javascript:history.back()" class="back-btn">← Kembali</a>
     </div>
 
     <div class="report-grid">
-        
         <div class="card">
             <div class="section-title">Rekap Berdasarkan Tarif</div>
             <div class="table-responsive">
@@ -194,17 +169,8 @@
                             <th>Jumlah Pelanggan</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($rekapTarif as $tarif => $jumlah)
-                            <tr>
-                                <td>{{ $tarif }}</td>
-                                <td>{{ number_format($jumlah) }}</td>
-                            </tr>
-                        @endforeach
-                        <tr class="total-row">
-                            <td>Total</td>
-                            <td>{{ number_format($rekapTarif->sum()) }}</td>
-                        </tr>
+                    <tbody id="bodyTarif">
+                        <tr><td colspan="2">Memuat...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -220,17 +186,8 @@
                             <th>Jumlah Pelanggan</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($rekapCabang as $cabang => $jumlah)
-                            <tr>
-                                <td>{{ $cabang }}</td>
-                                <td>{{ number_format($jumlah) }}</td>
-                            </tr>
-                        @endforeach
-                        <tr class="total-row">
-                            <td>Total</td>
-                            <td>{{ number_format($rekapCabang->sum()) }}</td>
-                        </tr>
+                    <tbody id="bodyCabang">
+                        <tr><td colspan="2">Memuat...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -246,17 +203,8 @@
                             <th>Jumlah Pelanggan</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($rekapZona as $zona => $jumlah)
-                            <tr>
-                                <td>{{ $zona }}</td>
-                                <td>{{ number_format($jumlah) }}</td>
-                            </tr>
-                        @endforeach
-                        <tr class="total-row">
-                            <td>Total</td>
-                            <td>{{ number_format($rekapZona->sum()) }}</td>
-                        </tr>
+                    <tbody id="bodyZona">
+                        <tr><td colspan="2">Memuat...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -272,17 +220,8 @@
                             <th>Jumlah Pelanggan</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($rekapStatus as $status => $jumlah)
-                            <tr>
-                                <td>{{ $status }}</td>
-                                <td>{{ number_format($jumlah) }}</td>
-                            </tr>
-                        @endforeach
-                        <tr class="total-row">
-                            <td>Total</td>
-                            <td>{{ number_format($rekapStatus->sum()) }}</td>
-                        </tr>
+                    <tbody id="bodyStatus">
+                        <tr><td colspan="2">Memuat...</td></tr>
                     </tbody>
                 </table>
             </div>
@@ -290,11 +229,65 @@
 
         <div class="card total-card-col">
             <div class="section-title">Total Keseluruhan Pelanggan</div>
-            <div class="total-box">{{ number_format($total) }}</div>
+            <div class="total-box" id="totalBox">0</div>
         </div>
-
     </div>
 </div>
 
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        const urlParams = new URLSearchParams(window.location.search);
+
+        fetch("{{ route('pelanggan.rekap.api') }}?" + urlParams.toString())
+            .then(response => response.json())
+            .then(res => {
+                renderTableGroup(res.rekapTarif, 'bodyTarif');
+                renderTableGroup(res.rekapCabang, 'bodyCabang');
+                renderTableGroup(res.rekapZona, 'bodyZona');
+                renderTableGroup(res.rekapStatus, 'bodyStatus');
+
+                document.getElementById('totalBox').innerText = Number(res.total).toLocaleString('id-ID');
+            })
+            .catch(err => {
+                console.error(err);
+                ['bodyTarif', 'bodyCabang', 'bodyZona', 'bodyStatus'].forEach(id => {
+                    document.getElementById(id).innerHTML = '<tr><td colspan="2" style="color:red;">Gagal memuat rekap data.</td></tr>';
+                });
+            });
+    });
+
+    function renderTableGroup(groupData, targetElementId) {
+        const tbody = document.getElementById(targetElementId);
+        tbody.innerHTML = '';
+
+        let sum = 0;
+        const keys = Object.keys(groupData);
+
+        if (keys.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;">Tidak ada data</td></tr>';
+            return;
+        }
+
+        keys.forEach(key => {
+            let count = groupData[key];
+            sum += count;
+
+            let tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td>${key === "" || key === "null" ? '[Tanpa Nama]' : key}</td>
+                <td>${Number(count).toLocaleString('id-ID')}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        let totalTr = document.createElement('tr');
+        totalTr.className = 'total-row';
+        totalTr.innerHTML = `
+            <td>Total</td>
+            <td>${Number(sum).toLocaleString('id-ID')}</td>
+        `;
+        tbody.appendChild(totalTr);
+    }
+</script>
 </body>
 </html>

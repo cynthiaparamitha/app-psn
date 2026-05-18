@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\DB;
 
 class MonitorController extends Controller
 {
-
     public function __construct()
     {
         if (!session()->has('user')) {
@@ -17,6 +16,11 @@ class MonitorController extends Controller
     }
 
     public function tarif(Request $request)
+    {
+        return view('monitor.tarif');
+    }
+    
+    public function getTarifDataApi(Request $request)
     {
         $bulan = $request->bulan;
         $sort  = $request->sort ?? 'bulan';
@@ -43,14 +47,25 @@ class MonitorController extends Controller
 
         if ($perPage === 'all') {
             $data = $query->get();
+            
+            return response()->json([
+                'is_all' => true,
+                'data'   => $data,
+                'total'  => $data->count()
+            ]);
         } else {
-            $data = $query->paginate($perPage)->withQueryString();
+            $data = $query->paginate($perPage)->onEachSide(0);
+            $dataArray = $data->toArray();
+
+            return response()->json([
+                'is_all'     => false,
+                'data'       => $dataArray['data'],
+                'total'      => $dataArray['total'],
+                'first_item' => $dataArray['from'],
+                'last_item'  => $dataArray['to'],
+                'last_page'  => $dataArray['last_page'],
+                'links'      => $dataArray['links']
+            ]);
         }
-
-        $nextOrder = ($order === 'asc') ? 'desc' : 'asc';
-
-        return view('monitor.tarif', compact(
-            'data', 'bulan', 'sort', 'order', 'nextOrder', 'perPage'
-        ));
     }
 }

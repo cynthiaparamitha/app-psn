@@ -18,12 +18,27 @@ class TagihanController extends Controller
     
     public function index(Request $request)
     {
+        $raw = DB::select("
+            SELECT status, cabang, zona FROM dbo.psn_tagihan
+        ");
+        $allData = collect($raw);
+
+        $zonaList   = $allData->pluck('zona')->filter()->unique()->sort()->values();
+        $cabangList = $allData->pluck('cabang')->filter()->unique()->sort()->values();
+        $statusList = $allData->pluck('status')->filter()->unique()->sort()->values();
+
+        return view('tagihan.index', compact('zonaList', 'cabangList', 'statusList'));
+    }
+
+    public function getDataApi(Request $request)
+    {
         $search    = $request->search;
         $zona      = $request->zona;
         $cabang    = $request->cabang;
         $status    = $request->status;
         $tunggakan = $request->tunggakan;
         $perPage   = $request->perPage ?? 10;
+        $sort      = $request->sort ?? 'default';
 
         $raw = DB::select("
             SELECT 
@@ -31,8 +46,8 @@ class TagihanController extends Controller
                 nama,
                 alamat,
                 status,
-                cabang,         -- cabang_nm
-                zona,           -- zona_cd
+                cabang,
+                zona,
                 drd_bulan,
                 drd_tagihan,
                 pembayaran_bulan,
@@ -43,13 +58,7 @@ class TagihanController extends Controller
             ORDER BY nopel ASC
         ");
 
-        $allData = collect($raw);
-
-        $zonaList   = $allData->pluck('zona')->filter()->unique()->sort()->values();
-        $cabangList = $allData->pluck('cabang')->filter()->unique()->sort()->values();
-        $statusList = $allData->pluck('status')->filter()->unique()->sort()->values();
-
-        $data = $allData;
+        $data = collect($raw);
 
         if ($search) {
             $s = strtolower($search);
@@ -66,51 +75,33 @@ class TagihanController extends Controller
         if ($tunggakan === "1") $data = $data->where('tunggakan_bulan', '>', 0);
         if ($tunggakan === "0") $data = $data->where('tunggakan_bulan', '=', 0);
 
-        $sort = $request->sort ?? 'default';
-
         switch ($sort) {
-            case 'nopel_asc':  
+            case 'nopel_asc':   
                 $data = $data->sortBy('nopel', SORT_NATURAL); 
                 break;
             case 'nopel_desc': 
                 $data = $data->sortByDesc('nopel', SORT_NATURAL); 
                 break;
-
             case 'drd_asc':    
                 $data = $data->sortBy(['drd_bulan', 'nopel']); 
                 break;
             case 'drd_desc':   
-                $data = $data->sortBy([
-                    ['drd_bulan', 'desc'],
-                    ['nopel', 'asc']
-                ]); 
+                $data = $data->sortBy([['drd_bulan', 'desc'], ['nopel', 'asc']]); 
                 break;
-
             case 'bayar_asc':  
                 $data = $data->sortBy(['pembayaran_bulan', 'nopel']); 
                 break;
             case 'bayar_desc': 
-                $data = $data->sortBy([
-                    ['pembayaran_bulan', 'desc'],
-                    ['nopel', 'asc']
-                ]); 
+                $data = $data->sortBy([['pembayaran_bulan', 'desc'], ['nopel', 'asc']]); 
                 break;
-
             case 'tunggak_asc':  
                 $data = $data->sortBy(['tunggakan_bulan', 'nopel']); 
                 break;
             case 'tunggak_desc': 
-                $data = $data->sortBy([
-                    ['tunggakan_bulan', 'desc'],
-                    ['nopel', 'asc']
-                ]); 
+                $data = $data->sortBy([['tunggakan_bulan', 'desc'], ['nopel', 'asc']]); 
                 break;
-
             default:
-                $data = $data->sortBy([
-                    ['drd_bulan', 'desc'],
-                    ['nopel', 'asc']
-                ]);
+                $data = $data->sortBy([['drd_bulan', 'desc'], ['nopel', 'asc']]);
         }
 
         $data = $data->values();
@@ -124,25 +115,38 @@ class TagihanController extends Controller
             'nom_tunggak'   => $data->sum('tunggakan_tagihan'),
         ];
 
-        if ($perPage !== 'all') {
+        if ($perPage === 'all') {
+            return response()->json([
+                'is_all'    => true,
+                'data'      => $data,
+                'total'     => $data->count(),
+                'fullTotal' => $fullTotal
+            ]);
+        } else {
             $current = LengthAwarePaginator::resolveCurrentPage();
             $offset  = ($current - 1) * $perPage;
+            $paged   = $data->slice($offset, $perPage)->values();
 
-            $paged = $data->slice($offset, $perPage)->values();
-
-            $data = new LengthAwarePaginator(
+            $paginator = new LengthAwarePaginator(
                 $paged,
                 $data->count(),
                 $perPage,
                 $current,
-                ['path' => url()->current(), 'query' => $request->query()]
+                ['path' => url()->current()]
             );
-        }
 
-        return view('tagihan.index', compact(
-            'data', 'search', 'zona', 'cabang', 'status', 'tunggakan',
-            'zonaList', 'cabangList', 'statusList', 'perPage', 'sort',
-            'fullTotal'
-        ));
+            $dataArray = $paginator->onEachSide(0)->toArray();
+
+            return response()->json([
+                'is_all'     => false,
+                'data'       => $dataArray['data'],
+                'total'      => $dataArray['total'],
+                'first_item' => $dataArray['from'],
+                'last_item'  => $dataArray['to'],
+                'last_page'  => $dataArray['last_page'],
+                'links'      => $dataArray['links'],
+                'fullTotal'  => $fullTotal
+            ]);
+        }
     }
 }

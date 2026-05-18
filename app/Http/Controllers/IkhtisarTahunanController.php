@@ -17,14 +17,25 @@ class IkhtisarTahunanController extends Controller
 
     public function index(Request $request)
     {
-        $tahun = $request->tahun;
-
         $listTahun = DB::table('vw_drd_zona_psn')
             ->select(DB::raw("DISTINCT LEFT(tabul,4) AS tahun"))
             ->orderBy('tahun', 'asc')
             ->pluck('tahun');
 
+        $tahun = $request->tahun ?? $listTahun->last();
+
+        return view('ikhtisar_tahunan', compact('listTahun', 'tahun'));
+    }
+
+    public function getDataApi(Request $request)
+    {
+        $tahun = $request->tahun;
+
         if (!$tahun) {
+            $listTahun = DB::table('vw_drd_zona_psn')
+                ->select(DB::raw("DISTINCT LEFT(tabul,4) AS tahun"))
+                ->orderBy('tahun', 'asc')
+                ->pluck('tahun');
             $tahun = $listTahun->last();
         }
 
@@ -82,21 +93,21 @@ class IkhtisarTahunanController extends Controller
         $k0 = $k1_5 = $k6_10 = $k11_20 = $k20 = [];
 
         $penerimaanData = DB::table('vw_zona_lhk')
-        ->select(
-            DB::raw("RIGHT(tabul,2) AS bulan"),
-            DB::raw("
-                SUM(
-                    ISNULL(air,0) +
-                    ISNULL(administrasi,0) +
-                    ISNULL(denda,0) +
-                    ISNULL(NAL,0)
-                ) AS total_penerimaan
-            ")
-        )
-        ->whereRaw("LEFT(tabul,4)=?", [$tahun])
-        ->groupBy(DB::raw("RIGHT(tabul,2)"))
-        ->orderBy(DB::raw("RIGHT(tabul,2)"))
-        ->get();
+            ->select(
+                DB::raw("RIGHT(tabul,2) AS bulan"),
+                DB::raw("
+                    SUM(
+                        ISNULL(air,0) +
+                        ISNULL(administrasi,0) +
+                        ISNULL(denda,0) +
+                        ISNULL(NAL,0)
+                    ) AS total_penerimaan
+                ")
+            )
+            ->whereRaw("LEFT(tabul,4)=?", [$tahun])
+            ->groupBy(DB::raw("RIGHT(tabul,2)"))
+            ->orderBy(DB::raw("RIGHT(tabul,2)"))
+            ->get();
 
         $penerimaan = [];
 
@@ -147,10 +158,19 @@ class IkhtisarTahunanController extends Controller
             $efektivitas[] = round((float)($efk->efektivitas_persen ?? 0), 2);
         }
 
-        return view('ikhtisar_tahunan', compact(
-            'labels','values','tahun','kubik','listTahun',
-            'labelsPemakaian','k0','k1_5','k6_10','k11_20','k20',
-            'penerimaan', 'efisiensi', 'efektivitas'
-        ));
+        return response()->json([
+            'labels'          => $labels,
+            'values'          => $values,
+            'kubik'           => $kubik,
+            'labelsPemakaian' => $labelsPemakaian,
+            'k0'              => $k0,
+            'k1_5'            => $k1_5,
+            'k6_10'           => $k6_10,
+            'k11_20'          => $k11_20,
+            'k20'             => $k20,
+            'penerimaan'      => $penerimaan,
+            'efisiensi'       => $efisiensi,
+            'efektivitas'     => $efektivitas
+        ]);
     }
 }

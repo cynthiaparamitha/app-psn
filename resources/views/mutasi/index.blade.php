@@ -125,42 +125,25 @@
             font-weight: bold;
         }
 
+        .loading-placeholder {
+            text-align: center;
+            padding: 24px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
         @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
-            
-            h2 {
-                font-size: 24px;
-            }
-            
-            .filter-box {
-                width: fit-content;
-            }
+            body { padding: 20px; }
+            h2 { font-size: 24px; }
+            .filter-box { width: fit-content; }
         }
 
         @media (min-width: 1024px) {
-            .container-drd {
-                padding-top: 10px;
-            }
-
-            h2 {
-                font-size: 26px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .report-row {
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
-
-            .table-col {
-                flex: 0 0 100%;
-                width: 100%;
-            }
+            .container-drd { padding-top: 10px; }
+            h2 { font-size: 26px; }
+            .card { padding: 20px; }
+            .report-row { flex-direction: row; flex-wrap: nowrap; }
+            .table-col { flex: 0 0 100%; width: 100%; }
         }
     </style>
 </head>
@@ -173,9 +156,9 @@
     <h2>Laporan Mutasi</h2>
 
     <div class="filter-box">
-        <form method="GET">
+        <form method="GET" onsubmit="event.preventDefault();">
             <label><b>Periode:</b></label>
-            <select name="tabul" onchange="this.form.submit()">
+            <select name="tabul" id="selectTabul" onchange="changePeriode(this.value)">
                 @php
                     $bulanSingkat = [
                         '01' => 'Jan', '02' => 'Feb', '03' => 'Mar', '04' => 'Apr',
@@ -217,35 +200,9 @@
                             <th>No. HP</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($data as $row)
-                            <tr>
-                                <td>{{ $row->cabang }}</td>
-                                <td class="right">{{ number_format($row->golongan, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->alamat_pelanggan, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->ganti_meter, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->pengaktifan_kembali, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->pelanggan_baru, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->aktif_ke_nonaktif, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->nama_pelanggan, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->stand_meter, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->ganti_nopel, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->no_handphone, 0, ',', '.') }}</td>
-                            </tr>
-                        @endforeach
-
-                        <tr class="total-row">
-                            <td>Total</td>
-                            <td class="right">{{ number_format($totals['golongan'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['alamat_pelanggan'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['ganti_meter'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['pengaktifan_kembali'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['pelanggan_baru'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['aktif_ke_nonaktif'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['nama_pelanggan'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['stand_meter'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['ganti_nopel'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($totals['no_handphone'], 0, ',', '.') }}</td>
+                    <tbody id="tableBodyMutasi">
+                        <tr>
+                            <td colspan="11" class="loading-placeholder">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -255,5 +212,127 @@
 
 </div>
 
+<script>
+    function formatRibuan(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    function changePeriode(tabul) {
+        const queryParams = `?tabul=${tabul}`;
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + queryParams;
+        
+        window.history.pushState({ tabul: tabul }, '', newUrl);
+
+        executeFetchMutasi(tabul);
+    }
+
+    async function executeFetchMutasi(tabul) {
+        const tbody = document.getElementById('tableBodyMutasi');
+        tbody.innerHTML = `<tr><td colspan="11" class="loading-placeholder">Memuat data...</td></tr>`;
+
+        try {
+            const response = await fetch(`{{ route('mutasi.api') }}?tabul=${tabul}`);
+            if (!response.ok) throw new Error("Gagal memuat respons database");
+
+            const res = await response.json();
+            
+            let rowsHtml = '';
+            
+            let total = {
+                golongan: 0, alamat_pelanggan: 0, ganti_meter: 0,
+                pengaktifan_kembali: 0, pelanggan_baru: 0, aktif_ke_nonaktif: 0,
+                nama_pelanggan: 0, stand_meter: 0, ganti_nopel: 0, no_handphone: 0
+            };
+
+            if (res.data.length === 0) {
+                rowsHtml = `<tr><td colspan="11" class="loading-placeholder">Tidak ada data mutasi untuk periode ini.</td></tr>`;
+            } else {
+                res.data.forEach(row => {
+                    const gol = parseInt(row.golongan) || 0;
+                    const alm = parseInt(row.alamat_pelanggan) || 0;
+                    const mtr = parseInt(row.ganti_meter) || 0;
+                    const pnk = parseInt(row.pengaktifan_kembali) || 0;
+                    const baru = parseInt(row.pelanggan_baru) || 0;
+                    const akn = parseInt(row.aktif_ke_nonaktif) || 0;
+                    const nma = parseInt(row.nama_pelanggan) || 0;
+                    const std = parseInt(row.stand_meter) || 0;
+                    const npl = parseInt(row.ganti_nopel) || 0;
+                    const hp = parseInt(row.no_handphone) || 0;
+
+                    total.golongan += gol;
+                    total.alamat_pelanggan += alm;
+                    total.ganti_meter += mtr;
+                    total.pengaktifan_kembali += pnk;
+                    total.pelanggan_baru += baru;
+                    total.aktif_ke_nonaktif += akn;
+                    total.nama_pelanggan += nma;
+                    total.stand_meter += std;
+                    total.ganti_nopel += npl;
+                    total.no_handphone += hp;
+
+                    rowsHtml += `
+                        <tr>
+                            <td>${row.cabang ?? '-'}</td>
+                            <td class="right">${formatRibuan(gol)}</td>
+                            <td class="right">${formatRibuan(alm)}</td>
+                            <td class="right">${formatRibuan(mtr)}</td>
+                            <td class="right">${formatRibuan(pnk)}</td>
+                            <td class="right">${formatRibuan(baru)}</td>
+                            <td class="right">${formatRibuan(akn)}</td>
+                            <td class="right">${formatRibuan(nma)}</td>
+                            <td class="right">${formatRibuan(std)}</td>
+                            <td class="right">${formatRibuan(npl)}</td>
+                            <td class="right">${formatRibuan(hp)}</td>
+                        </tr>
+                    `;
+                });
+
+                rowsHtml += `
+                    <tr class="total-row">
+                        <td>Total</td>
+                        <td class="right">${formatRibuan(total.golongan)}</td>
+                        <td class="right">${formatRibuan(total.alamat_pelanggan)}</td>
+                        <td class="right">${formatRibuan(total.ganti_meter)}</td>
+                        <td class="right">${formatRibuan(total.pengaktifan_kembali)}</td>
+                        <td class="right">${formatRibuan(total.pelanggan_baru)}</td>
+                        <td class="right">${formatRibuan(total.aktif_ke_nonaktif)}</td>
+                        <td class="right">${formatRibuan(total.nama_pelanggan)}</td>
+                        <td class="right">${formatRibuan(total.stand_meter)}</td>
+                        <td class="right">${formatRibuan(total.ganti_nopel)}</td>
+                        <td class="right">${formatRibuan(total.no_handphone)}</td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = rowsHtml;
+
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = `
+                <tr><td colspan="11" class="loading-placeholder" style="color:red; font-weight:bold;">
+                    Gagal mengambil data dari server. Silakan muat ulang halaman.
+                </td></tr>
+            `;
+        }
+    }
+
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.tabul) {
+            document.getElementById('selectTabul').value = event.state.tabul;
+            executeFetchMutasi(event.state.tabul);
+        } else {
+            const defaultTabul = document.getElementById('selectTabul').value;
+            executeFetchMutasi(defaultTabul);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const initialTabul = document.getElementById('selectTabul').value;
+        
+        window.history.replaceState({ tabul: initialTabul }, '', window.location.href);
+        
+        executeFetchMutasi(initialTabul);
+    });
+</script>
 </body>
 </html>

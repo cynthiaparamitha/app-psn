@@ -20,7 +20,6 @@ class LhkController extends Controller
         $tabul = $request->tabul;
         $zona  = $request->zona;
 
-        // List tabul
         $listTabul = DB::table('vw_zona_lhk')
             ->select('tabul')
             ->distinct()
@@ -31,38 +30,51 @@ class LhkController extends Controller
             $tabul = $listTabul->first()->tabul ?? null;
         }
 
+        return view('lhk.index', compact('listTabul', 'tabul', 'zona'));
+    }
+
+    public function getDataApi(Request $request)
+    {
+        $tabul = $request->tabul;
+        $zona  = $request->zona;
+
         if (!$tabul) {
-            return view('lhk.index_zona', [
-                'data'      => [],
-                'listTabul' => $listTabul,
-                'tabul'     => null,
-            ]);
+            return response()->json(['mode' => 'zona', 'tabul' => null, 'zona' => null, 'data' => []]);
         }
 
-        if (!$zona) {
-
-            $data = DB::table('vw_zona_lhk')
+        if ($zona) {
+            $data = DB::table('vw_cabang_lhk')
                 ->where('tabul', $tabul)
-                ->orderBy('zona')
+                ->where('zona', $zona)
+                ->orderBy('cabang')
                 ->get()
                 ->map(function ($row) {
-                    $row->total = $row->air + $row->administrasi + $row->denda + $row->NAL;
+                    $row->total = (float)($row->air + $row->administrasi + $row->denda + $row->NAL);
                     return $row;
                 });
 
-            return view('lhk.index_zona', compact('data', 'listTabul', 'tabul'));
+            return response()->json([
+                'mode'  => 'cabang',
+                'tabul' => $tabul,
+                'zona'  => $zona,
+                'data'  => $data
+            ]);
         }
 
-        $data = DB::table('vw_cabang_lhk')
+        $data = DB::table('vw_zona_lhk')
             ->where('tabul', $tabul)
-            ->where('zona', $zona)
-            ->orderBy('cabang')
+            ->orderBy('zona')
             ->get()
             ->map(function ($row) {
-                $row->total = $row->air + $row->administrasi + $row->denda + $row->NAL;
+                $row->total = (float)($row->air + $row->administrasi + $row->denda + $row->NAL);
                 return $row;
             });
 
-        return view('lhk.index_cabang', compact('data', 'listTabul', 'tabul', 'zona'));
+        return response()->json([
+            'mode'  => 'zona',
+            'tabul' => $tabul,
+            'zona'  => null,
+            'data'  => $data
+        ]);
     }
 }

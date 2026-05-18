@@ -125,42 +125,25 @@
             font-weight: bold;
         }
 
+        .loading-placeholder {
+            text-align: center;
+            padding: 24px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
         @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
-            
-            h2 {
-                font-size: 24px;
-            }
-            
-            .filter-box {
-                width: fit-content;
-            }
+            body { padding: 20px; }
+            h2 { font-size: 24px; }
+            .filter-box { width: fit-content; }
         }
 
         @media (min-width: 1024px) {
-            .container-drd {
-                padding-top: 10px;
-            }
-
-            h2 {
-                font-size: 26px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .report-row {
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
-
-            .table-col {
-                flex: 0 0 100%;
-                width: 100%;
-            }
+            .container-drd { padding-top: 10px; }
+            h2 { font-size: 26px; }
+            .card { padding: 20px; }
+            .report-row { flex-direction: row; flex-wrap: nowrap; }
+            .table-col { flex: 0 0 100%; width: 100%; }
         }
     </style>
 </head>
@@ -173,9 +156,9 @@
     <h2>Laporan Pemakaian</h2>
 
     <div class="filter-box">
-        <form method="GET">
+        <form method="GET" onsubmit="event.preventDefault();">
             <label><b>Periode:</b></label>
-            <select name="tabul" onchange="this.form.submit()">
+            <select name="tabul" id="selectTabul" onchange="changePeriode(this.value)">
                 @php
                     $bulanSingkat = [
                         '01'=>'Jan','02'=>'Feb','03'=>'Mar','04'=>'Apr',
@@ -190,24 +173,13 @@
                         $bulan = substr($t->tabul,4,2);
                         $label = $bulanSingkat[$bulan].' '.$tahun;
                     @endphp
-
-                    <option value="{{ $t->tabul }}" {{ $tabul==$t->tabul?'selected':'' }}>
+                    <option value="{{ $t->tabul }}" {{ $tabul == $t->tabul ? 'selected' : '' }}>
                         {{ $label }}
                     </option>
                 @endforeach
             </select>
         </form>
     </div>
-
-    @php
-    $t = [
-        'plg0'=>0,'m30'=>0,'tag0'=>0,
-        'plg1'=>0,'m31'=>0,'tag1'=>0,
-        'plg6'=>0,'m36'=>0,'tag6'=>0,
-        'plg11'=>0,'m311'=>0,'tag11'=>0,
-        'plg21'=>0,'m321'=>0,'tag21'=>0,
-    ];
-    @endphp
 
     <div class="report-row">
         <div class="card table-col">
@@ -230,77 +202,9 @@
                             <th>PLG</th><th>M³</th><th>REK AIR + ADM</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($data as $row)
-                            @php
-                            $t['plg0'] += $row->jumlah_plg_k_0;
-                            $t['m30']  += $row->kubik_0;
-                            $t['tag0'] += $row->tagihan_k_0;
-
-                            $t['plg1'] += $row->jumlah_plg_k_1_5;
-                            $t['m31']  += $row->kubik_1_5;
-                            $t['tag1'] += $row->tagihan_k_1_5;
-
-                            $t['plg6'] += $row->jumlah_plg_k_6_10;
-                            $t['m36']  += $row->kubik_6_10;
-                            $t['tag6'] += $row->tagihan_k_6_10;
-
-                            $t['plg11'] += $row->jumlah_plg_k_11_20;
-                            $t['m311']  += $row->kubik_11_20;
-                            $t['tag11'] += $row->tagihan_k_11_20;
-
-                            $t['plg21'] += $row->jumlah_plg_lbh_20;
-                            $t['m321']  += $row->kubik_lbh_20;
-                            $t['tag21'] += $row->tagihan_lbh_20;
-                            @endphp
-
-                            <tr>
-                                <td>{{ $row->zona_cd }}</td>
-
-                                <td class="right">{{ number_format($row->jumlah_plg_k_0, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->kubik_0, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->tagihan_k_0, 0, ',', '.') }}</td>
-
-                                <td class="right">{{ number_format($row->jumlah_plg_k_1_5, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->kubik_1_5, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->tagihan_k_1_5, 0, ',', '.') }}</td>
-
-                                <td class="right">{{ number_format($row->jumlah_plg_k_6_10, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->kubik_6_10, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->tagihan_k_6_10, 0, ',', '.') }}</td>
-
-                                <td class="right">{{ number_format($row->jumlah_plg_k_11_20, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->kubik_11_20, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->tagihan_k_11_20, 0, ',', '.') }}</td>
-
-                                <td class="right">{{ number_format($row->jumlah_plg_lbh_20, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->kubik_lbh_20, 0, ',', '.') }}</td>
-                                <td class="right">{{ number_format($row->tagihan_lbh_20, 0, ',', '.') }}</td>
-                            </tr>
-                        @endforeach
-
-                        <tr class="total-row">
-                            <td>Total</td>
-
-                            <td class="right">{{ number_format($t['plg0'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['m30'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['tag0'], 0, ',', '.') }}</td>
-
-                            <td class="right">{{ number_format($t['plg1'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['m31'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['tag1'], 0, ',', '.') }}</td>
-
-                            <td class="right">{{ number_format($t['plg6'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['m36'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['tag6'], 0, ',', '.') }}</td>
-
-                            <td class="right">{{ number_format($t['plg11'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['m311'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['tag11'], 0, ',', '.') }}</td>
-
-                            <td class="right">{{ number_format($t['plg21'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['m321'], 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($t['tag21'], 0, ',', '.') }}</td>
+                    <tbody id="tableBodyPemakaian">
+                        <tr>
+                            <td colspan="16" class="loading-placeholder">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -310,5 +214,151 @@
 
 </div>
 
+<script>
+    function formatRibuan(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    function changePeriode(tabul) {
+        const queryParams = `?tabul=${tabul}`;
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + queryParams;
+        
+        window.history.pushState({ tabul: tabul }, '', newUrl);
+
+        executeFetchPemakaian(tabul);
+    }
+
+    async function executeFetchPemakaian(tabul) {
+        const tbody = document.getElementById('tableBodyPemakaian');
+        tbody.innerHTML = `<tr><td colspan="16" class="loading-placeholder">Mengambil data...</td></tr>`;
+
+        try {
+            const response = await fetch(`{{ route('pemakaian.api') }}?tabul=${tabul}`);
+            if (!response.ok) throw new Error("Gagal memuat respons database");
+
+            const res = await response.json();
+            
+            let rowsHtml = '';
+            
+            let total = {
+                plg0: 0, m30: 0, tag0: 0,
+                plg1: 0, m31: 0, tag1: 0,
+                plg6: 0, m36: 0, tag6: 0,
+                plg11: 0, m311: 0, tag11: 0,
+                plg21: 0, m321: 0, tag21: 0
+            };
+
+            if (res.data.length === 0) {
+                rowsHtml = `<tr><td colspan="16" class="loading-placeholder">Tidak ada data pemakaian untuk periode ini.</td></tr>`;
+            } else {
+                res.data.forEach(row => {
+                const plg0 = parseInt(row.jumlah_plg_k_0) || 0;
+                const m30  = parseInt(row.kubik_0) || 0;
+                const tag0 = parseInt(row.tagihan_k_0) || 0;
+
+                const plg1 = parseInt(row.jumlah_plg_k_1_5) || 0;
+                const m31  = parseInt(row.kubik_1_5) || 0;
+                const tag1 = parseInt(row.tagihan_k_1_5) || 0;
+
+                const plg6 = parseInt(row.jumlah_plg_k_6_10) || 0;
+                const m36  = parseInt(row.kubik_6_10) || 0;
+                const tag6 = parseInt(row.tagihan_k_6_10) || 0;
+
+                const plg11 = parseInt(row.jumlah_plg_k_11_20) || 0;
+                const m311  = parseInt(row.kubik_11_20) || 0;
+                const tag11 = parseInt(row.tagihan_k_11_20) || 0;
+
+                const plg21 = parseInt(row.jumlah_plg_lbh_20) || 0;
+                const m321  = parseInt(row.kubik_lbh_20) || 0;
+                const tag21 = parseInt(row.tagihan_lbh_20) || 0;
+
+                total.plg0 += plg0; total.m30 += m30; total.tag0 += tag0;
+                total.plg1 += plg1; total.m31 += m31; total.tag1 += tag1;
+                total.plg6 += plg6; total.m36 += m36; total.tag6 += tag6;
+                total.plg11 += plg11; total.m311 += m311; total.tag11 += tag11;
+                total.plg21 += plg21; total.m321 += m321; total.tag21 += tag21;
+
+                    rowsHtml += `
+                        <tr>
+                            <td>${row.zona_cd}</td>
+                            <td class="right">${formatRibuan(plg0)}</td>
+                            <td class="right">${formatRibuan(m30)}</td>
+                            <td class="right">${formatRibuan(tag0)}</td>
+                            
+                            <td class="right">${formatRibuan(plg1)}</td>
+                            <td class="right">${formatRibuan(m31)}</td>
+                            <td class="right">${formatRibuan(tag1)}</td>
+                            
+                            <td class="right">${formatRibuan(plg6)}</td>
+                            <td class="right">${formatRibuan(m36)}</td>
+                            <td class="right">${formatRibuan(tag6)}</td>
+                            
+                            <td class="right">${formatRibuan(plg11)}</td>
+                            <td class="right">${formatRibuan(m311)}</td>
+                            <td class="right">${formatRibuan(tag11)}</td>
+                            
+                            <td class="right">${formatRibuan(plg21)}</td>
+                            <td class="right">${formatRibuan(m321)}</td>
+                            <td class="right">${formatRibuan(tag21)}</td>
+                        </tr>
+                    `;
+                });
+
+                rowsHtml += `
+                    <tr class="total-row">
+                        <td>Total</td>
+                        <td class="right">${formatRibuan(total.plg0)}</td>
+                        <td class="right">${formatRibuan(total.m30)}</td>
+                        <td class="right">${formatRibuan(total.tag0)}</td>
+
+                        <td class="right">${formatRibuan(total.plg1)}</td>
+                        <td class="right">${formatRibuan(total.m31)}</td>
+                        <td class="right">${formatRibuan(total.tag1)}</td>
+
+                        <td class="right">${formatRibuan(total.plg6)}</td>
+                        <td class="right">${formatRibuan(total.m36)}</td>
+                        <td class="right">${formatRibuan(total.tag6)}</td>
+
+                        <td class="right">${formatRibuan(total.plg11)}</td>
+                        <td class="right">${formatRibuan(total.m311)}</td>
+                        <td class="right">${formatRibuan(total.tag11)}</td>
+
+                        <td class="right">${formatRibuan(total.plg21)}</td>
+                        <td class="right">${formatRibuan(total.m321)}</td>
+                        <td class="right">${formatRibuan(total.tag21)}</td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = rowsHtml;
+
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = `
+                <tr><td colspan="16" class="loading-placeholder" style="color:red; font-weight:bold;">
+                    Gagal mengambil data dari server. Silakan muat ulang halaman.
+                </td></tr>
+            `;
+        }
+    }
+
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.tabul) {
+            document.getElementById('selectTabul').value = event.state.tabul;
+            executeFetchPemakaian(event.state.tabul);
+        } else {
+            const defaultTabul = document.getElementById('selectTabul').value;
+            executeFetchPemakaian(defaultTabul);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const initialTabul = document.getElementById('selectTabul').value;
+        
+        window.history.replaceState({ tabul: initialTabul }, '', window.location.href);
+        
+        executeFetchPemakaian(initialTabul);
+    });
+</script>
 </body>
 </html>

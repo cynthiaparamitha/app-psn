@@ -4,9 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perumda Tirta Patriot - Laporan Tagihan PSN</title>
-
+    
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
-
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -14,7 +13,6 @@
             margin: 0;
             padding: 10px;
         }
-
         .container-drd {
             width: 100%;
             max-width: 1360px;
@@ -22,7 +20,6 @@
             padding-top: 15px;
             box-sizing: border-box;
         }
-
         h2 {
             margin-top: 10px;
             margin-bottom: 18px;
@@ -30,7 +27,6 @@
             font-size: 22px;
             font-weight: bold;
         }
-
         .filter-box {
             background: #ffffff;
             padding: 12px 15px;
@@ -40,14 +36,12 @@
             width: 100%;
             box-sizing: border-box;
         }
-
         .filter-box form {
             display: flex;
             align-items: center;
             flex-wrap: wrap;
             gap: 10px;
         }
-
         select, input[type=text] {
             padding: 8px 12px;
             border: 1px solid #bbb;
@@ -56,11 +50,9 @@
             background: #fff;
             box-sizing: border-box;
         }
-
         input[type=text] {
             min-width: 200px;
         }
-
         button {
             padding: 8px 18px;
             background: #3498db;
@@ -71,11 +63,9 @@
             font-weight: bold;
             font-size: 14px;
         }
-
         button:hover {
             background: #2980b9;
         }
-
         .reset-text {
             color: #888;
             font-size: 14px;
@@ -83,11 +73,9 @@
             text-decoration: none;
             font-weight: bold;
         }
-
         .reset-text:hover {
             text-decoration: underline;
         }
-
         .report-row {
             display: flex;
             flex-direction: column; 
@@ -96,7 +84,6 @@
             margin-bottom: 20px;
             box-sizing: border-box;
         }
-
         .card {
             background: white;
             border-radius: 12px;
@@ -105,13 +92,11 @@
             box-sizing: border-box;
             width: 100%; 
         }
-
         .table-responsive {
             width: 100%;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
         }
-
         table {
             width: 100%;
             border-collapse: collapse;
@@ -120,7 +105,6 @@
             overflow: hidden;
             border: 1px solid #ddd;
         }
-
         table th {
             background: #34495e;
             color: white;
@@ -131,38 +115,31 @@
             text-align: center;
             white-space: nowrap;
         }
-
+        table th a {
+            color: white;
+            text-decoration: none;
+            display: inline-block;
+        }
         table td {
             padding: 10px 10px;
             border: 1px solid #ddd;
             font-size: 13px;
             white-space: nowrap;
         }
-
         table tr:nth-child(even) {
             background: #fafafa;
         }
-
         table tr:hover {
             background: #eef5ff !important;
         }
-
         .num { text-align: right; }
         .center { text-align: center; }
 
-        table tr.warning-row {
-            background: #fff9e6;
-        }
-        table tr.warning-row td {
-            color: #b7791f;
-        }
+        table tr.warning-row { background: #fff9e6; }
+        table tr.warning-row td { color: #b7791f; }
 
-        table tr.danger-row {
-            background: #fdf2f2;
-        }
-        table tr.danger-row td {
-            color: #c0392b;
-        }
+        table tr.danger-row { background: #fdf2f2; }
+        table tr.danger-row td { color: #c0392b; }
 
         .pagination-container {
             margin-top: 20px; 
@@ -172,22 +149,15 @@
             justify-content: space-between; 
             align-items: center;
         }
-
-        .pagination-container nav {
-            display: inline-block;
-        }
-
         .pagination-container ul {
             display: flex;
             list-style: none;
             padding: 0;
             margin: 0;
         }
-
         .pagination-container li {
             margin: 0 4px;
         }
-
         .pagination-container li a,
         .pagination-container li span {
             display: inline-block;
@@ -200,58 +170,32 @@
             font-size: 13px;
             transition: background 0.2s ease;
         }
-
         .pagination-container li a:hover {
             background: #2980b9;
         }
-
-        .pagination-container li[aria-disabled="true"] span,
         .pagination-container li.disabled span {
             background: #bdc3c7;
             color: #ffffff;
             cursor: not-allowed;
         }
-
-        @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
-            
-            h2 {
-                font-size: 24px;
-            }
-            
-            .filter-box {
-                width: fit-content;
-            }
-
-            .pagination-container {
-                flex-direction: row;
-            }
+        .pagination-container li.active span {
+            background: #2c3e50;
+            color: #ffffff;
+            cursor: default;
         }
 
+        @media (min-width: 768px) {
+            body { padding: 20px; }
+            h2 { font-size: 24px; }
+            .filter-box { width: fit-content; }
+            .pagination-container { flex-direction: row; }
+        }
         @media (min-width: 1024px) {
-            .container-drd {
-                padding-top: 10px;
-            }
-
-            h2 {
-                font-size: 26px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .report-row {
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
-
-            .table-col {
-                flex: 0 0 100%;
-                width: 100%;
-            }
+            .container-drd { padding-top: 10px; }
+            h2 { font-size: 26px; }
+            .card { padding: 20px; }
+            .report-row { flex-direction: row; flex-wrap: nowrap; }
+            .table-col { flex: 0 0 100%; width: 100%; }
         }
     </style>
 </head>
@@ -259,67 +203,52 @@
 
 @include('layouts.navbar')
 
-@php
-    $total_bulan_drd       = $fullTotal['bulan_drd'];
-    $total_nominal_drd     = $fullTotal['nom_drd'];
-
-    $total_bulan_bayar     = $fullTotal['bulan_bayar'];
-    $total_nominal_bayar   = $fullTotal['nom_bayar'];
-
-    $total_bulan_tunggakan = $fullTotal['bulan_tunggak'];
-    $total_nominal_tunggak = $fullTotal['nom_tunggak'];
-@endphp
-
 <div class="container-drd">
 
     <h2>📊 Laporan Tagihan</h2>
 
     <div class="filter-box">
-        <form method="GET" action="">
+        <form id="filterForm" onsubmit="event.preventDefault(); fetchData(1);">
+            
+            <input type="hidden" name="sort" id="currentSort" value="default">
 
-            <a href="{{ url('tagihan') }}" class="reset-text">⟳ Reset</a>
+            <a href="javascript:void(0)" id="btnReset" class="reset-text">⟳ Reset</a>
 
-            <input type="text" name="search" placeholder="Cari nopel / nama" value="{{ $search ?? '' }}">
+            <input type="text" name="search" id="search" placeholder="Cari nopel / nama">
 
-            <select name="zona">
+            <select name="zona" onchange="fetchData(1)">
                 <option value="">-- Zona --</option>
                 @foreach($zonaList as $z)
-                    <option value="{{ $z }}" {{ ($zona ?? '') == $z ? 'selected' : '' }}>
-                        {{ $z }}
-                    </option>
+                    <option value="{{ $z }}">{{ $z }}</option>
                 @endforeach
             </select>
 
-            <select name="cabang">
+            <select name="cabang" onchange="fetchData(1)">
                 <option value="">-- K. Pelayanan --</option>
                 @foreach($cabangList as $c)
-                    <option value="{{ $c }}" {{ ($cabang ?? '') == $c ? 'selected' : '' }}>
-                        {{ $c }}
-                    </option>
+                    <option value="{{ $c }}">{{ $c }}</option>
                 @endforeach
             </select>
 
-            <select name="status">
+            <select name="status" onchange="fetchData(1)">
                 <option value="">-- Status --</option>
                 @foreach($statusList as $s)
-                    <option value="{{ $s }}" {{ ($status ?? '') == $s ? 'selected' : '' }}>
-                        {{ $s }}
-                    </option>
+                    <option value="{{ $s }}">{{ $s }}</option>
                 @endforeach
             </select>
 
-            <select name="tunggakan">
+            <select name="tunggakan" onchange="fetchData(1)">
                 <option value="">-- Tunggakan --</option>
-                <option value="1" {{ ($tunggakan ?? '') == '1' ? 'selected' : '' }}>Ada Tunggakan</option>
-                <option value="0" {{ ($tunggakan ?? '') == '0' ? 'selected' : '' }}>Tidak Ada Tunggakan</option>
+                <option value="1">Ada Tunggakan</option>
+                <option value="0">Tidak Ada Tunggakan</option>
             </select>
 
-            <select name="perPage">
-                <option value="10"  {{ ($perPage ?? 10) == 10 ? 'selected' : '' }}>10</option>
-                <option value="25"  {{ ($perPage ?? 10) == 25 ? 'selected' : '' }}>25</option>
-                <option value="50"  {{ ($perPage ?? 10) == 50 ? 'selected' : '' }}>50</option>
-                <option value="100" {{ ($perPage ?? 10) == 100 ? 'selected' : '' }}>100</option>
-                <option value="all" {{ ($perPage ?? 10) == 'all' ? 'selected' : '' }}>All</option>
+            <select name="perPage" onchange="fetchData(1)">
+                <option value="10">10</option>
+                <option value="25">25</option>
+                <option value="50">50</option>
+                <option value="100">100</option>
+                <option value="all">All</option>
             </select>
 
             <button type="submit">Filter</button>
@@ -327,39 +256,13 @@
         </form>
     </div>
 
-    @php
-    function sort_link($label, $field, $sort) {
-        $currentSort = request('sort');
-        $direction = 'desc';
-
-        if ($currentSort === $field . '_desc') {
-            $direction = 'asc';
-        }
-
-        $newSort = $field . '_' . $direction;
-
-        $icon = '';
-        if ($currentSort === $field . '_asc') {
-            $icon = ' ▲';
-        } elseif ($currentSort === $field . '_desc') {
-            $icon = ' ▼';
-        }
-
-        $query = request()->query();
-        $query['sort'] = $newSort;
-
-        return '<a href="?' . http_build_query($query) . '" style="color:white; text-decoration:none; display:inline-block;">'
-            . $label . '<span style="font-size: 11px; opacity: 0.8;">' . $icon . '</span></a>';
-    }
-    @endphp
-
     <div class="report-row">
         <div class="card table-col">
             <div class="table-responsive">
                 <table>
                     <thead>
                         <tr>
-                            <th rowspan="2">{!! sort_link('No Pel', 'nopel', $sort) !!}</th>
+                            <th rowspan="2"><a href="javascript:void(0)" onclick="changeSort('nopel')">No Pel <span id="icon_nopel"></span></a></th>
                             <th rowspan="2">Nama</th>
                             <th rowspan="2">Alamat</th>
                             <th rowspan="2">Status</th>
@@ -370,78 +273,213 @@
                             <th colspan="2">TUNGGAKAN</th>
                         </tr>
                         <tr>
-                            <th>{!! sort_link('Bulan', 'drd', $sort) !!}</th>
+                            <th><a href="javascript:void(0)" onclick="changeSort('drd')">Bulan <span id="icon_drd"></span></a></th>
                             <th>Tagihan</th>
-                            <th>{!! sort_link('Bulan', 'bayar', $sort) !!}</th>
+                            <th><a href="javascript:void(0)" onclick="changeSort('bayar')">Bulan <span id="icon_bayar"></span></a></th>
                             <th>Tagihan</th>
-                            <th>{!! sort_link('Bulan', 'tunggak', $sort) !!}</th>
+                            <th><a href="javascript:void(0)" onclick="changeSort('tunggak')">Bulan <span id="icon_tunggak"></span></a></th>
                             <th>Tagihan</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($data as $d)
-                            @php
-                                $rowClass = '';
-                                if ($d->tunggakan_bulan >= 6) {
-                                    $rowClass = 'danger-row';
-                                } elseif ($d->tunggakan_bulan >= 3) {
-                                    $rowClass = 'warning-row';
-                                }
-                            @endphp
-
-                            <tr class="{{ $rowClass }}">
-                                <td class="center">{{ $d->nopel }}</td>
-                                <td>{{ $d->nama }}</td>
-                                <td>{{ $d->alamat }}</td>
-                                <td class="center">{{ $d->status }}</td>
-                                <td class="center">{{ $d->cabang }}</td>
-                                <td class="center">{{ $d->zona }}</td>
-
-                                <td class="center">{{ $d->drd_bulan }}</td>
-                                <td class="num">{{ number_format($d->drd_tagihan, 0, ',', '.') }}</td>
-
-                                <td class="center">{{ $d->pembayaran_bulan }}</td>
-                                <td class="num">{{ number_format($d->pembayaran_tagihan, 0, ',', '.') }}</td>
-
-                                <td class="center"><b>{{ $d->tunggakan_bulan }}</b></td>
-                                <td class="num"><b>{{ number_format($d->tunggakan_tagihan, 0, ',', '.') }}</b></td>
-                            </tr>
-                        @endforeach
-
-                        <tr style="background: #34495e; color: white; font-weight: bold; border-top: 2px solid #2c3e50; pointer-events: none;">
-                            <td colspan="6" class="num" style="color: white;">TOTAL :</td>
-                            <td class="center">{{ $total_bulan_drd }}</td>
-                            <td class="num">{{ number_format($total_nominal_drd, 0, ',', '.') }}</td>
-                            <td class="center">{{ $total_bulan_bayar }}</td>
-                            <td class="num">{{ number_format($total_nominal_bayar, 0, ',', '.') }}</td>
-                            <td class="center">{{ $total_bulan_tunggakan }}</td>
-                            <td class="num">{{ number_format($total_nominal_tunggak, 0, ',', '.') }}</td>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="12" style="text-align:center; padding:15px;">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
             </div>
 
-            @if($perPage === 'all')
-                <div style="margin-top: 20px; font-size: 14px; color: #555;">
-                    Showing all {{ count($data) }} data
-                </div>
-            @else
-                @if(method_exists($data, 'links'))
-                    <div class="pagination-container">
-                        <div style="font-size: 14px; color: #555;">
-                            Showing {{ $data->firstItem() }} - {{ $data->lastItem() }} of {{ $data->total() }} data
-                        </div>
-                        <div>
-                            {{ $data->onEachSide(0)->links('pagination::simple-default') }}
-                        </div>
-                    </div>
-                @endif
-            @endif
+            <div id="paginationOuter"></div>
 
         </div>
     </div>
 
 </div>
 
+<script>
+    let currentPage = 1;
+
+    document.addEventListener("DOMContentLoaded", function() {
+        fetchData();
+
+        document.getElementById('btnReset').addEventListener('click', function() {
+            document.getElementById('filterForm').reset();
+            document.getElementById('currentSort').value = 'default';
+            resetSortIcons();
+            fetchData(1);
+        });
+    });
+
+    function changeSort(field) {
+        const sortInput = document.getElementById('currentSort');
+        let current = sortInput.value;
+        let direction = 'desc';
+
+        if (current === field + '_desc') {
+            direction = 'asc';
+        }
+        
+        sortInput.value = field + '_' + direction;
+        
+        resetSortIcons();
+        
+        const iconSpan = document.getElementById('icon_' + field);
+        if (direction === 'asc') {
+            iconSpan.innerHTML = ' ▲';
+        } else {
+            iconSpan.innerHTML = ' ▼';
+        }
+
+        fetchData(1);
+    }
+
+    function resetSortIcons() {
+        ['nopel', 'drd', 'bayar', 'tunggak'].forEach(f => {
+            const el = document.getElementById('icon_' + f);
+            if(el) el.innerHTML = '';
+        });
+    }
+
+    function fetchData(page = 1) {
+        currentPage = page;
+        
+        const form = document.getElementById('filterForm');
+        const formData = new FormData(form);
+        const searchParams = new URLSearchParams(formData);
+
+        if (searchParams.get('perPage') !== 'all') {
+            searchParams.append('page', page);
+        }
+
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:15px;">Memuat data...</td></tr>';
+
+        fetch("{{ route('tagihan.api') }}?" + searchParams.toString())
+            .then(response => response.json())
+            .then(res => {
+                tbody.innerHTML = '';
+                
+                if (!res.data || res.data.length === 0) {
+                    tbody.innerHTML = `
+                        <tr>
+                            <td colspan="12" style="text-align:center; padding:15px; color: #888;">
+                                <i>Tidak ada data ditemukan...</i>
+                            </td>
+                        </tr>`;
+                    document.getElementById('paginationOuter').innerHTML = '';
+                    return;
+                }
+
+                res.data.forEach(item => {
+                    let tr = document.createElement('tr');
+                    
+                    let tBulan = parseInt(item.tunggakan_bulan) || 0;
+                    if (tBulan >= 6) {
+                        tr.className = 'danger-row';
+                    } else if (tBulan >= 3) {
+                        tr.className = 'warning-row';
+                    }
+
+                    tr.innerHTML = `
+                        <td class="center">${item.nopel ?? ''}</td>
+                        <td>${item.nama ?? ''}</td>
+                        <td>${item.alamat ?? ''}</td>
+                        <td class="center">${item.status ?? ''}</td>
+                        <td class="center">${item.cabang ?? ''}</td>
+                        <td class="center">${item.zona ?? ''}</td>
+                        <td class="center">${item.drd_bulan ?? 0}</td>
+                        <td class="num">${Number(item.drd_tagihan ?? 0).toLocaleString('id-ID')}</td>
+                        <td class="center">${item.pembayaran_bulan ?? 0}</td>
+                        <td class="num">${Number(item.pembayaran_tagihan ?? 0).toLocaleString('id-ID')}</td>
+                        <td class="center"><b>${item.tunggakan_bulan ?? 0}</b></td>
+                        <td class="num"><b>${Number(item.tunggakan_tagihan ?? 0).toLocaleString('id-ID')}</b></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                let fT = res.fullTotal;
+                let totalTr = document.createElement('tr');
+                totalTr.style = "background: #34495e; color: white; font-weight: bold; border-top: 2px solid #2c3e50; pointer-events: none;";
+                totalTr.innerHTML = `
+                    <td colspan="6" class="num" style="color: white;">TOTAL :</td>
+                    <td class="center">${Number(fT.bulan_drd).toLocaleString('id-ID')}</td>
+                    <td class="num">${Number(fT.nom_drd).toLocaleString('id-ID')}</td>
+                    <td class="center">${Number(fT.bulan_bayar).toLocaleString('id-ID')}</td>
+                    <td class="num">${Number(fT.nom_bayar).toLocaleString('id-ID')}</td>
+                    <td class="center">${Number(fT.bulan_tunggak).toLocaleString('id-ID')}</td>
+                    <td class="num">${Number(fT.nom_tunggak).toLocaleString('id-ID')}</td>
+                `;
+                tbody.appendChild(totalTr);
+
+                renderPagination(res);
+            })
+            .catch(err => {
+                console.error(err);
+                tbody.innerHTML = '<tr><td colspan="12" style="text-align:center; padding:15px; color:red;">Gagal memuat data dari server.</td></tr>';
+            });
+    }
+
+    function renderPagination(res) {
+        const pOuter = document.getElementById('paginationOuter');
+        pOuter.innerHTML = '';
+
+        if (res.is_all) {
+            pOuter.innerHTML = `
+                <div style="margin-top: 20px; font-size: 14px; color: #555;">
+                    Showing all ${Number(res.total).toLocaleString('id-ID')} data
+                </div>`;
+            return;
+        }
+
+        let html = `
+            <div class="pagination-container">
+                <div style="font-size: 14px; color: #555;">
+                    Showing <b>${res.first_item ?? 0}</b> - <b>${res.last_item ?? 0}</b> of <b>${Number(res.total).toLocaleString('id-ID')}</b> data
+                </div>
+                <div>
+                    <ul>
+        `;
+
+        const links = res.links;
+        const lastPage = res.last_page;
+
+        links.forEach((link) => {
+            let label = link.label;
+            let isPageNumber = !isNaN(label);
+
+            let targetPage = null;
+            if (link.url) {
+                const urlObj = new URL(link.url);
+                targetPage = parseInt(urlObj.searchParams.get('page'));
+            }
+
+            if (isPageNumber) {
+                let pageNum = parseInt(label);
+                if (pageNum !== 1 && pageNum !== lastPage && Math.abs(pageNum - currentPage) > 1) {
+                    if (pageNum === 2 && currentPage > 3) {
+                        html += `<li class="disabled"><span>...</span></li>`;
+                    } else if (pageNum === lastPage - 1 && currentPage < lastPage - 2) {
+                        html += `<li class="disabled"><span>...</span></li>`;
+                    }
+                    return; 
+                }
+            }
+
+            if (label.includes('Previous')) label = '‹';
+            if (label.includes('Next')) label = '›';
+
+            if (link.active) {
+                html += `<li class="active"><span>${label}</span></li>`;
+            } else if (!link.url) {
+                html += `<li class="disabled"><span>${label}</span></li>`;
+            } else {
+                html += `<li><a href="javascript:void(0)" onclick="fetchData(${targetPage})">${label}</a></li>`;
+            }
+        });
+
+        html += `</ul></div></div>`;
+        pOuter.innerHTML = html;
+    }
+</script>
 </body>
 </html>

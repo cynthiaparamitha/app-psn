@@ -119,10 +119,6 @@
             font-variant-numeric: tabular-nums;
         }
 
-        .left {
-            text-align: left;
-        }
-
         .progress {
             font-weight: bold;
             color: #2c3e50;
@@ -134,42 +130,25 @@
             font-weight: bold;
         }
 
+        .loading-placeholder {
+            text-align: center;
+            padding: 20px;
+            font-style: italic;
+            color: #7f8c8d;
+        }
+
         @media (min-width: 768px) {
-            body {
-                padding: 20px;
-            }
-            
-            h2 {
-                font-size: 24px;
-            }
-            
-            .filter-box {
-                width: fit-content;
-            }
+            body { padding: 20px; }
+            h2 { font-size: 24px; }
+            .filter-box { width: fit-content; }
         }
 
         @media (min-width: 1024px) {
-            .container-drd {
-                padding-top: 10px;
-            }
-
-            h2 {
-                font-size: 26px;
-            }
-
-            .card {
-                padding: 20px;
-            }
-
-            .report-row {
-                flex-direction: row;
-                flex-wrap: nowrap;
-            }
-
-            .table-col {
-                flex: 0 0 100%;
-                width: 100%;
-            }
+            .container-drd { padding-top: 10px; }
+            h2 { font-size: 26px; }
+            .card { padding: 20px; }
+            .report-row { flex-direction: row; flex-wrap: nowrap; }
+            .table-col { flex: 0 0 100%; width: 100%; }
         }
     </style>
 </head>
@@ -182,9 +161,9 @@
     <h2>Progress Pemasangan Per Zona</h2>
 
     <div class="filter-box">
-        <form method="GET">
+        <form method="GET" onsubmit="event.preventDefault();">
             <label><b>Periode:</b></label>
-            <select name="tabul" onchange="this.form.submit()">
+            <select name="tabul" id="selectTabul" onchange="changePeriode(this.value)">
                 @php
                     $bulanSingkat = [
                         '01'=>'Jan','02'=>'Feb','03'=>'Mar','04'=>'Apr',
@@ -206,17 +185,6 @@
         </form>
     </div>
 
-    @php
-        function romawi($angka) {
-            $map = [1=>'I', 2=>'II', 3=>'III', 4=>'IV'];
-            return $map[$angka] ?? $angka;
-        }
-
-        $grandTotalPendaftar = 0;
-        $grandTotalPasang = 0;
-        $grandTotalMutasi = 0;
-    @endphp
-
     <div class="report-row">
         <div class="card table-col">
             <div class="table-responsive">
@@ -231,39 +199,9 @@
                             <th>Mutasi Pelanggan Baru</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @foreach($data as $i => $row)
-                            @php
-                                $pendaftar = $row->Pendaftar ?? 0;
-                                $pasang    = $row->Terpasang ?? 0;
-                                $mutasi    = $row->Mutasi_Pelanggan ?? 0;
-
-                                $grandTotalPendaftar += $pendaftar;
-                                $grandTotalPasang    += $pasang;
-                                $grandTotalMutasi    += $mutasi;
-
-                                $progress = $pendaftar > 0 ? "$pasang/$pendaftar" : '0/0';
-                            @endphp
-                            <tr>
-                                <td>{{ $i + 1 }}</td>
-                                <td>Zona {{ romawi($row->zona) }}</td>
-                                <td class="right progress">{{ $progress }}</td>
-                                <td class="right">{{ number_format($pendaftar,0,',','.') }}</td>
-                                <td class="right">{{ number_format($pasang,0,',','.') }}</td>
-                                <td class="right">{{ number_format($mutasi,0,',','.') }}</td>
-                            </tr>
-                        @endforeach
-
-                        @php
-                            $totalProgress = $grandTotalPendaftar > 0 ? "$grandTotalPasang/$grandTotalPendaftar" : '0/0';
-                        @endphp
-                        <tr class="total-row">
-                            <td>-</td>
-                            <td>Total</td>
-                            <td class="right">{{ $totalProgress }}</td>
-                            <td class="right">{{ number_format($grandTotalPendaftar, 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($grandTotalPasang, 0, ',', '.') }}</td>
-                            <td class="right">{{ number_format($grandTotalMutasi, 0, ',', '.') }}</td>
+                    <tbody id="tableBodyPasang">
+                        <tr>
+                            <td colspan="6" class="loading-placeholder">Memuat data...</td>
                         </tr>
                     </tbody>
                 </table>
@@ -273,5 +211,108 @@
 
 </div>
 
+<script>
+    function formatRibuan(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+    }
+
+    function romawi(angka) {
+        const map = {1: 'I', 2: 'II', 3: 'III', 4: 'IV'};
+        return map[angka] || angka;
+    }
+
+    function changePeriode(tabul) {
+        const queryParams = `?tabul=${tabul}`;
+        const newUrl = window.location.protocol + "//" + window.location.host + window.location.pathname + queryParams;
+        
+        window.history.pushState({ tabul: tabul }, '', newUrl);
+
+        executeFetchPasang(tabul);
+    }
+
+    // Fungsi fetch data asynchronous
+    async function executeFetchPasang(tabul) {
+        const tbody = document.getElementById('tableBodyPasang');
+        tbody.innerHTML = `<tr><td colspan="6" class="loading-placeholder">Memuat data...</td></tr>`;
+
+        try {
+            const response = await fetch(`{{ route('pasang.api') }}?tabul=${tabul}`);
+            if (!response.ok) throw new Error("Gagal mengambil data");
+
+            const res = await response.json();
+            
+            let rowsHtml = '';
+            let grandTotalPendaftar = 0;
+            let grandTotalPasang = 0;
+            let grandTotalMutasi = 0;
+
+            if (res.data.length === 0) {
+                rowsHtml = `<tr><td colspan="6" class="loading-placeholder">Tidak ada data untuk periode ini.</td></tr>`;
+            } else {
+                res.data.forEach((row, i) => {
+                    const pendaftar = parseInt(row.Pendaftar ?? 0);
+                    const pasang = parseInt(row.Terpasang ?? 0);
+                    const mutasi = parseInt(row.Mutasi_Pelanggan ?? 0);
+
+                    grandTotalPendaftar += pendaftar;
+                    grandTotalPasang += pasang;
+                    grandTotalMutasi += mutasi;
+
+                    const progress = pendaftar > 0 ? `${pasang}/${pendaftar}` : '0/0';
+
+                    rowsHtml += `
+                        <tr>
+                            <td>${i + 1}</td>
+                            <td>Zona ${romawi(row.zona)}</td>
+                            <td class="right progress">${progress}</td>
+                            <td class="right">${formatRibuan(pendaftar)}</td>
+                            <td class="right">${formatRibuan(pasang)}</td>
+                            <td class="right">${formatRibuan(mutasi)}</td>
+                        </tr>
+                    `;
+                });
+
+                const totalProgress = grandTotalPendaftar > 0 ? `${grandTotalPasang}/${grandTotalPendaftar}` : '0/0';
+
+                rowsHtml += `
+                    <tr class="total-row">
+                        <td>-</td>
+                        <td>Total</td>
+                        <td class="right">${totalProgress}</td>
+                        <td class="right">${formatRibuan(grandTotalPendaftar)}</td>
+                        <td class="right">${formatRibuan(grandTotalPasang)}</td>
+                        <td class="right">${formatRibuan(grandTotalMutasi)}</td>
+                    </tr>
+                `;
+            }
+
+            tbody.innerHTML = rowsHtml;
+
+        } catch (error) {
+            console.error(error);
+            tbody.innerHTML = `
+                <tr><td colspan="6" class="loading-placeholder" style="color:red;">Gagal memuat data dari database. Silakan muat ulang halaman.</td></tr>
+            `;
+        }
+    }
+
+    window.addEventListener('popstate', function(event) {
+        if (event.state && event.state.tabul) {
+            document.getElementById('selectTabul').value = event.state.tabul;
+            executeFetchPasang(event.state.tabul);
+        } else {
+            const defaultTabul = document.getElementById('selectTabul').value;
+            executeFetchPasang(defaultTabul);
+        }
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+        const initialTabul = document.getElementById('selectTabul').value;
+        
+        window.history.replaceState({ tabul: initialTabul }, '', window.location.href);
+        
+        executeFetchPasang(initialTabul);
+    });
+</script>
 </body>
 </html>

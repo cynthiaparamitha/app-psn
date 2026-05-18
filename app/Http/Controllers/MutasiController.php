@@ -19,45 +19,42 @@ class MutasiController extends Controller
     {
         $tabul = $request->tabul;
 
-        if (!$tabul) {
-            $tabul = DB::table('TR_mutasi')
-                ->where('tabul','>=','202412')
-                ->whereNotIn('tabul',['210307','301306'])
-                ->whereRaw("LEN(tabul)=6")
-                ->where('tabul','not like','%-%')
-                ->whereRaw("ISNUMERIC(tabul)=1")
-                ->max('tabul');
-        }
-
-        $listTabul = DB::table('TR_mutasi')
-            ->where('tabul','>=','202412')
-            ->whereNotIn('tabul',['210307','301306'])
+        $baseQuery = DB::table('TR_mutasi')
+            ->where('tabul', '>=', '202412')
+            ->whereNotIn('tabul', ['210307', '301306'])
             ->whereRaw("LEN(tabul)=6")
-            ->where('tabul','not like','%-%')
-            ->whereRaw("ISNUMERIC(tabul)=1")
+            ->where('tabul', 'not like', '%-%')
+            ->whereRaw("ISNUMERIC(tabul)=1");
+
+        $listTabul = (clone $baseQuery)
             ->select('tabul')
             ->distinct()
-            ->orderBy('tabul','desc')
+            ->orderBy('tabul', 'desc')
             ->get();
+
+        if (!$tabul) {
+            $tabul = (clone $baseQuery)->max('tabul');
+        }
+
+        return view('mutasi.index', compact('listTabul', 'tabul'));
+    }
+
+    public function getDataApi(Request $request)
+    {
+        $tabul = $request->tabul;
+
+        if (!$tabul) {
+            return response()->json(['tabul' => null, 'data' => []]);
+        }
 
         $data = DB::table('vw_mutasi_psn')
             ->where('tabul', $tabul)
             ->orderBy('cabang')
             ->get();
 
-        $totals = [
-            'golongan' => $data->sum('golongan'),
-            'alamat_pelanggan' => $data->sum('alamat_pelanggan'),
-            'ganti_meter' => $data->sum('ganti_meter'),
-            'pengaktifan_kembali' => $data->sum('pengaktifan_kembali'),
-            'pelanggan_baru' => $data->sum('pelanggan_baru'),
-            'aktif_ke_nonaktif' => $data->sum('aktif_ke_nonaktif'),
-            'nama_pelanggan' => $data->sum('nama_pelanggan'),
-            'stand_meter' => $data->sum('stand_meter'),
-            'ganti_nopel' => $data->sum('ganti_nopel'),
-            'no_handphone' => $data->sum('no_handphone'),
-        ];
-
-        return view('mutasi.index', compact('data','listTabul','tabul','totals'));
+        return response()->json([
+            'tabul' => $tabul,
+            'data'  => $data
+        ]);
     }
 }
