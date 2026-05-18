@@ -3,7 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rekap Pelanggan PSN</title>
+    <title>Perumda Tirta Patriot - Rekap Pelanggan PSN</title>
+
+    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
 
     <style>
         body {
