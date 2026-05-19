@@ -354,7 +354,7 @@
         } catch (error) {
             console.error(error);
             document.getElementById('tableBodyLhk').innerHTML = `
-                <tr><td colspan="6" class="loading-placeholder" style="color:red;">Gagal memuat data dari database. Silakan muat ulang halaman.</td></tr>
+                <tr><td colspan="6" class="loading-placeholder" style="color:red;">Gagal memuat data dari server.</td></tr>
             `;
         }
     }

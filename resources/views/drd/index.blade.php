@@ -375,7 +375,7 @@
         } catch (error) {
             console.error(error);
             document.getElementById('tableBodyDrd').innerHTML = `
-                <tr><td colspan="9" class="loading-placeholder" style="color:red;">Gagal memuat data dari database. Silakan muat ulang halaman.</td></tr>
+                <tr><td colspan="9" class="loading-placeholder" style="color:red;">Gagal memuat data dari server.</td></tr>
             `;
         }
     }

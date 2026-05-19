@@ -310,7 +310,7 @@
             console.error(error);
             tbody.innerHTML = `
                 <tr><td colspan="11" class="loading-placeholder" style="color:red; font-weight:bold;">
-                    Gagal mengambil data dari server. Silakan muat ulang halaman.
+                    Gagal memuat data dari server.
                 </td></tr>
             `;
         }

@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Perumda Tirta Patriot - Detail Pelanggan PSN</title>
-    
+
     <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
     <style>
         body {
@@ -422,7 +422,7 @@
             })
             .catch(err => {
                 console.error(err);
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">Gagal mengambil data.</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align:center; color:red;">Gagal memuat data dari server.</td></tr>';
             });
     }
 

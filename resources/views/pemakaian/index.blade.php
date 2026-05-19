@@ -230,7 +230,7 @@
 
     async function executeFetchPemakaian(tabul) {
         const tbody = document.getElementById('tableBodyPemakaian');
-        tbody.innerHTML = `<tr><td colspan="16" class="loading-placeholder">Mengambil data...</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="16" class="loading-placeholder">Memuat data...</td></tr>`;
 
         try {
             const response = await fetch(`{{ route('pemakaian.api') }}?tabul=${tabul}`);
@@ -336,7 +336,7 @@
             console.error(error);
             tbody.innerHTML = `
                 <tr><td colspan="16" class="loading-placeholder" style="color:red; font-weight:bold;">
-                    Gagal mengambil data dari server. Silakan muat ulang halaman.
+                    Gagal memuat data dari server.
                 </td></tr>
             `;
         }

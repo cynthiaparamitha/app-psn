@@ -421,7 +421,7 @@
         } catch (error) {
             console.error("Kesalahan AJAX:", error);
             document.getElementById('tableBodyAir').innerHTML = `
-                <tr><td colspan="2" class="loading-placeholder" style="color:red;">Gagal memuat data dari database. Silakan segarkan halaman.</td></tr>
+                <tr><td colspan="2" class="loading-placeholder" style="color:red;">Gagal memuat data dari server.</td></tr>
             `;
             updateComponentTitles(tahun + " (Gagal Sinkronisasi)");
         }
