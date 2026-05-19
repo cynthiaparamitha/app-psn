@@ -8,8 +8,7 @@
     @endenv
     <title>Perumda Tirta Patriot - Progress Pemasangan PSN</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
-
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -239,7 +238,7 @@
         tbody.innerHTML = `<tr><td colspan="6" class="loading-placeholder">Memuat data...</td></tr>`;
 
         try {
-            const response = await fetch(`{{ route('pasang.api') }}?tabul=${tabul}`);
+            const response = await fetch(`{{ route('pasang.api', [], false) }}?tabul=${tabul}`);
             if (!response.ok) throw new Error("Gagal mengambil data");
 
             const res = await response.json();

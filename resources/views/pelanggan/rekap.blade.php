@@ -8,7 +8,7 @@
     @endenv
     <title>Perumda Tirta Patriot - Rekap Pelanggan PSN</title>
     
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -241,7 +241,7 @@
     document.addEventListener("DOMContentLoaded", function() {
         const urlParams = new URLSearchParams(window.location.search);
 
-        fetch("{{ route('pelanggan.rekap.api') }}?" + urlParams.toString())
+        fetch("{{ route('pelanggan.rekap.api', [], false) }}?" + urlParams.toString())
             .then(response => response.json())
             .then(res => {
                 renderTableGroup(res.rekapTarif, 'bodyTarif');

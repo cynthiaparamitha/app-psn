@@ -8,7 +8,7 @@
     @endenv
     <title>Perumda Tirta Patriot - Detail Pelanggan PSN</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -395,7 +395,7 @@
         document.getElementById('icon-nopel').innerText = currentSort === 'nopel' ? (currentOrder === 'asc' ? '▲' : '▼') : '';
         document.getElementById('icon-nama').innerText = currentSort === 'nama' ? (currentOrder === 'asc' ? '▲' : '▼') : '';
 
-        fetch("{{ route('pelanggan.api') }}?" + params.toString())
+        fetch("{{ route('pelanggan.api', [], false) }}?" + params.toString())
             .then(response => response.json())
             .then(res => {
                 tbody.innerHTML = '';

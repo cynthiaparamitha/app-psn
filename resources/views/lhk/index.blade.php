@@ -8,8 +8,7 @@
     @endenv
     <title>Perumda Tirta Patriot - LHK PSN</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
-
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -290,7 +289,7 @@
         `;
 
         try {
-            const response = await fetch(`{{ route('lhk.api') }}?tabul=${tabul}&zona=${encodeURIComponent(zona)}`);
+            const response = await fetch(`{{ route('lhk.api', [], false) }}?tabul=${tabul}&zona=${encodeURIComponent(zona)}`);
             if (!response.ok) throw new Error("Gagal mengambil data");
             
             const res = await response.json();

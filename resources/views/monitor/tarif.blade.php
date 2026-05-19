@@ -8,7 +8,7 @@
     @endenv
     <title>Perumda Tirta Patriot - Monitoring Tarif PSN</title>
     
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="icon" type="image/png" href="/images/logo.png">
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -295,7 +295,7 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:15px;">Memuat data...</td></tr>';
 
-        fetch("{{ route('monitoring.tarif.api') }}?" + searchParams.toString())
+        fetch("{{ route('monitoring.tarif.api', [], false) }}?" + searchParams.toString())
             .then(response => response.json())
             .then(res => {
                 tbody.innerHTML = '';

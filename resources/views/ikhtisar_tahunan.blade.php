@@ -8,7 +8,7 @@
     @endenv
     <title>Perumda Tirta Patriot - Ikhtisar Tahunan</title>
 
-    <link rel="icon" type="image/png" href="{{ asset('images/logo.png') }}">
+    <link rel="icon" type="image/png" href="/images/logo.png">
 
 <style>
     body {
@@ -288,7 +288,7 @@
         if (chartEfektivitas) { chartEfektivitas.destroy(); chartEfektivitas = null; }
 
         try {
-            const response = await fetch(`{{ route('ikhtisar.tahunan.api') }}?tahun=${tahun}`);
+            const response = await fetch(`{{ route('ikhtisar.tahunan.api', [], false) }}?tahun=${tahun}`);
             if (!response.ok) throw new Error("Gagal mengambil data");
             
             const resData = await response.json();
